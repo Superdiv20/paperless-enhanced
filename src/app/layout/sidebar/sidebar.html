@@ -1,15 +1,12 @@
 <div hlmSidebarWrapper class="flex-col">
-  <ng-content select="[header]" />
   <div class="flex flex-1">
-    <hlm-sidebar
-      sidebarContainerClass="top-(--header-height) h-[calc(100svh-var(--header-height))]"
-    >
+    <hlm-sidebar variant="inset">
       <hlm-sidebar-header>
         <ul hlmSidebarMenu>
           <li hlmSidebarMenuItem>
             <a hlmSidebarMenuButton size="lg" href="#">
               <div
-                class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
+                class="bg-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
               >
                 <ng-icon name="lucideLeaf" class="text-base" />
               </div>
@@ -38,6 +35,10 @@
         <paperless-nav-administration
           [administrationItems]="data.navAdministration"
         ></paperless-nav-administration>
+        <paperless-nav-secondary
+          class="mt-auto"
+          [currentVersion]="currentVersion"
+        ></paperless-nav-secondary>
       </hlm-sidebar-content>
       <hlm-sidebar-footer>
         <!-- <spartan-nav-user [user]="data.user" /> -->
