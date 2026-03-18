@@ -46,9 +46,7 @@
       "@spartan-ng/helm/calendar": [
         "./src/app/shared/ui-common/calendar/src/index.ts"
       ],
-      "@spartan-ng/helm/card": [
-        "./src/app/shared/ui-common/card/src/index.ts"
-      ],
+      "@spartan-ng/helm/card": ["./src/app/shared/ui-common/card/src/index.ts"],
       "@spartan-ng/helm/carousel": [
         "./src/app/shared/ui-common/carousel/src/index.ts"
       ],
@@ -88,9 +86,7 @@
       "@spartan-ng/helm/hover-card": [
         "./src/app/shared/ui-common/hover-card/src/index.ts"
       ],
-      "@spartan-ng/helm/icon": [
-        "./src/app/shared/ui-common/icon/src/index.ts"
-      ],
+      "@spartan-ng/helm/icon": ["./src/app/shared/ui-common/icon/src/index.ts"],
       "@spartan-ng/helm/input": [
         "./src/app/shared/ui-common/input/src/index.ts"
       ],
@@ -100,12 +96,8 @@
       "@spartan-ng/helm/input-otp": [
         "./src/app/shared/ui-common/input-otp/src/index.ts"
       ],
-      "@spartan-ng/helm/item": [
-        "./src/app/shared/ui-common/item/src/index.ts"
-      ],
-      "@spartan-ng/helm/kbd": [
-        "./src/app/shared/ui-common/kbd/src/index.ts"
-      ],
+      "@spartan-ng/helm/item": ["./src/app/shared/ui-common/item/src/index.ts"],
+      "@spartan-ng/helm/kbd": ["./src/app/shared/ui-common/kbd/src/index.ts"],
       "@spartan-ng/helm/label": [
         "./src/app/shared/ui-common/label/src/index.ts"
       ],
@@ -166,9 +158,7 @@
       "@spartan-ng/helm/table": [
         "./src/app/shared/ui-common/table/src/index.ts"
       ],
-      "@spartan-ng/helm/tabs": [
-        "./src/app/shared/ui-common/tabs/src/index.ts"
-      ],
+      "@spartan-ng/helm/tabs": ["./src/app/shared/ui-common/tabs/src/index.ts"],
       "@spartan-ng/helm/textarea": [
         "./src/app/shared/ui-common/textarea/src/index.ts"
       ],
@@ -186,7 +176,8 @@
       ],
       "@spartan-ng/helm/utils": [
         "./src/app/shared/ui-common/utils/src/index.ts"
-      ]
+      ],
+      "@shared/*": ["./src/app/shared/*"]
     }
   },
   "angularCompilerOptions": {
