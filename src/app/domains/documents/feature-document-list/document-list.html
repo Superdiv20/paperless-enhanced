@@ -1,0 +1,40 @@
+<div class="w-full h-full p-4">
+  <paperless-document-list-head class="mb-4"></paperless-document-list-head>
+  @if (isLoading()) {
+    <div class="w-full h-full flex items-center justify-center">
+      <hlm-spinner class="text-2xl" icon="lucideLoader" />
+    </div>
+  }
+
+  @switch (viewMode()) {
+    @case ("list") {
+      <div class="space-y-4">
+        @for (doc of documents(); track doc.id) {
+          <paperless-document-card-horizontal
+            [document]="doc"
+            [displayFields]="displayFieldIds()"
+          ></paperless-document-card-horizontal>
+        }
+      </div>
+    }
+    @case ("table") {
+      <paperless-document-table
+        [documents]="documents()"
+        [displayFields]="displayFieldIds()"
+        [loading]="isLoading()"
+      />
+    }
+    @case ("grid") {
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
+        @for (doc of documents(); track doc.id) {
+          <paperless-document-card-vertical
+            [document]="doc"
+            [displayFields]="displayFieldIds()"
+          ></paperless-document-card-vertical>
+        }
+      </div>
+    }
+  }
+</div>

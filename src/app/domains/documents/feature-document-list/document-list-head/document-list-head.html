@@ -1,0 +1,106 @@
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <!-- Search Bar -->
+  <div hlmInputGroup class="w-full h-8">
+    <input
+      hlmInputGroupInput
+      placeholder="Search documents..."
+      [value]="searchQuery()"
+      (input)="onSearchChange($any($event.target).value)"
+    />
+    <div hlmInputGroupAddon>
+      <ng-icon name="lucideSearch" />
+    </div>
+  </div>
+
+  <!-- Filter Button -->
+  <button
+    hlmBtn
+    variant="outline"
+    size="sm"
+    class="hidden sm:inline-flex"
+    aria-label="Filter documents"
+  >
+    <ng-icon name="lucideFilter" />
+    Filter
+    <span hlmBadge variant="secondary" aria-label="Filter count">0</span>
+  </button>
+
+  <!-- Sort Button -->
+  <button
+    hlmBtn
+    variant="outline"
+    size="sm"
+    [disabled]="displayMode() === DisplayMode.TABLE"
+    class="hidden sm:inline-flex"
+    aria-label="Sort documents"
+    [hlmDropdownMenuTrigger]="sorting"
+  >
+    Sort
+    <ng-icon name="lucideArrowUpDown" />
+  </button>
+  <ng-template #sorting>
+    <hlm-dropdown-menu class="w-56">
+      <hlm-dropdown-menu-group>
+        @for (field of sortFields; track field.field) {
+          <button
+            hlmDropdownMenuRadio
+            [checked]="isSortFieldActive(field)"
+            (triggered)="setSortField(field)"
+          >
+            <hlm-dropdown-menu-radio-indicator />
+            <span>{{ field.name }}</span>
+          </button>
+        }
+      </hlm-dropdown-menu-group>
+    </hlm-dropdown-menu>
+  </ng-template>
+
+  <!-- Field Selector -->
+  <button
+    hlmBtn
+    variant="outline"
+    size="sm"
+    class="hidden sm:inline-flex"
+    aria-label="Select fields to display"
+    [hlmDropdownMenuTrigger]="fields"
+  >
+    Fields
+    <ng-icon name="lucideColumns3Cog" />
+  </button>
+  <ng-template #fields>
+    <hlm-dropdown-menu class="w-56">
+      <hlm-dropdown-menu-group>
+        @for (field of allDisplayFields; track field.id) {
+          <button
+            hlmDropdownMenuCheckbox
+            [checked]="isDisplayFieldActive(field.id)"
+            (triggered)="toggleDisplayField(field.id)"
+          >
+            <hlm-dropdown-menu-checkbox-indicator />
+            <span>{{ field.name }}</span>
+          </button>
+        }
+      </hlm-dropdown-menu-group>
+    </hlm-dropdown-menu>
+  </ng-template>
+
+  <!-- View Toggle -->
+  <div
+    hlmToggleGroup
+    type="single"
+    variant="outline"
+    size="sm"
+    [value]="displayMode()"
+    (valueChange)="onDisplayModeChange($any($event))"
+  >
+    <button hlmToggleGroupItem value="table" title="Table view">
+      <ng-icon name="lucideTable" />
+    </button>
+    <button hlmToggleGroupItem value="grid" title="Grid view">
+      <ng-icon name="lucideLayoutGrid" />
+    </button>
+    <button hlmToggleGroupItem value="list" title="List view">
+      <ng-icon name="lucideList" />
+    </button>
+  </div>
+</div>

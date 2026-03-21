@@ -1,0 +1,236 @@
+<article
+  class="group/item relative flex flex-wrap gap-4 rounded-lg bg-card p-4 shadow-sm transition-all hover:bg-accent/30 hover:shadow-md"
+  [attr.aria-label]="'Document: ' + document().title"
+>
+  <!-- Multi-select checkbox -->
+  <div
+    class="absolute right-4 top-4 opacity-0 transition-opacity group-hover/item:opacity-100"
+  >
+    <hlm-checkbox
+      aria-label="Select document"
+      (click)="$event.stopPropagation()"
+    />
+  </div>
+
+  <!-- Thumbnail -->
+  <div class="relative shrink-0">
+    <!-- Mobile: compact icon -->
+    <div
+      class="flex h-10 w-10 items-center justify-center rounded border bg-muted sm:hidden"
+    >
+      <ng-icon name="lucideFileText" class="text-lg text-muted-foreground" />
+    </div>
+    <!-- Desktop: full portrait thumbnail -->
+    @if (!thumbnailError() && document().thumbnail_url) {
+      <img
+        [src]="document().thumbnail_url"
+        [alt]="document().title ?? 'Document thumbnail'"
+        class="hidden h-full w-36 rounded border object-cover sm:block"
+        (error)="thumbnailError.set(true)"
+      />
+    } @else {
+      <div
+        class="hidden h-full w-36 items-center justify-center rounded border bg-muted sm:flex"
+      >
+        <ng-icon name="lucideFileText" class="text-3xl text-muted-foreground" />
+      </div>
+    }
+  </div>
+
+  <!-- Main content -->
+  <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+    <!-- Metadata row above title -->
+    <div class="flex flex-wrap items-center gap-1.5">
+      @if (
+        displayFields().includes(DisplayField.CORRESPONDENT) &&
+        document().correspondent
+      ) {
+        <span class="text-xs font-medium text-primary"
+          >Correspondent {{ document().correspondent }}</span
+        >
+      }
+      @if (
+        displayFields().includes(DisplayField.DOCUMENT_TYPE) &&
+        document().document_type
+      ) {
+        <span hlmBadge variant="secondary"
+          >Type {{ document().document_type }}</span
+        >
+      }
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-lg font-semibold leading-tight">{{ document().title }}</h3>
+
+    <!-- Date -->
+    @if (displayFields().includes(DisplayField.CREATED) && document().created) {
+      <time
+        [attr.datetime]="document().created | date: 'yyyy-MM-dd'"
+        class="text-xs text-muted-foreground"
+      >
+        {{ document().created | date: "d. MMMM yyyy" }}
+      </time>
+    }
+
+    <!-- Content preview: highlights preferred over raw content -->
+    @if (document().content) {
+      <div class="relative">
+        <p class="line-clamp-3 text-sm text-muted-foreground">
+          {{ document().content }}
+        </p>
+        <div
+          class="pointer-events-none absolute bottom-0 left-0 right-0 h-5 bg-linear-to-t from-card to-transparent"
+        ></div>
+      </div>
+    }
+
+    <!-- Tags -->
+    @if (
+      displayFields().includes(DisplayField.TAGS) && document().tags?.length
+    ) {
+      <div class="flex flex-wrap gap-1">
+        @for (tag of document().tags; track tag) {
+          <span hlmBadge variant="outline">Tag {{ tag }}</span>
+        }
+      </div>
+    }
+
+    <!-- Action buttons -->
+    <div class="mt-auto flex flex-wrap gap-2 pt-1.5">
+      <!-- Anzeigen (primary) -->
+      <button
+        hlmBtn
+        variant="default"
+        size="sm"
+        class="hidden sm:inline-flex"
+        aria-label="Anzeigen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideEye" />
+        View
+      </button>
+      <button
+        hlmBtn
+        variant="default"
+        size="icon-sm"
+        class="sm:hidden"
+        [hlmTooltip]="'Anzeigen'"
+        aria-label="Anzeigen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideEye" />
+      </button>
+
+      <!-- Öffnen -->
+      <button
+        hlmBtn
+        variant="outline"
+        size="sm"
+        class="hidden sm:inline-flex"
+        aria-label="Öffnen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideFolderOpen" />
+        Open
+      </button>
+      <button
+        hlmBtn
+        variant="outline"
+        size="icon-sm"
+        class="sm:hidden"
+        [hlmTooltip]="'Öffnen'"
+        aria-label="Öffnen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideFolderOpen" />
+      </button>
+
+      <!-- Herunterladen -->
+      <button
+        hlmBtn
+        variant="outline"
+        size="sm"
+        class="hidden sm:inline-flex"
+        aria-label="Herunterladen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideDownload" />
+        Download
+      </button>
+      <button
+        hlmBtn
+        variant="outline"
+        size="icon-sm"
+        class="sm:hidden"
+        [hlmTooltip]="'Herunterladen'"
+        aria-label="Herunterladen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideDownload" />
+      </button>
+
+      <!-- Overflow menu -->
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon-sm"
+        [hlmDropdownMenuTrigger]="moreMenu"
+        aria-label="Weitere Aktionen"
+        (click)="$event.stopPropagation()"
+      >
+        <ng-icon name="lucideEllipsis" />
+      </button>
+      <ng-template #moreMenu>
+        <div hlmDropdownMenu>
+          <button hlmDropdownMenuItem (click)="$event.stopPropagation()">
+            <ng-icon name="lucideFileSearchCorner" />
+            Similar Documents
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Right metadata column -->
+  <div
+    class="shrink-0 flex items-end justify-end gap-1.5 text-xs text-muted-foreground"
+  >
+    @if (displayFields().includes(DisplayField.CREATED) && document().created) {
+      <time
+        [attr.datetime]="document().created | date: 'yyyy-MM-dd'"
+        class="flex items-center gap-1"
+      >
+        <ng-icon name="lucideCalendarFold" class="text-sm" />
+        {{ document().created | date: "dd.MM.yyyy" }}
+      </time>
+    }
+    @if (displayFields().includes(DisplayField.ADDED) && document().added) {
+      <time
+        [attr.datetime]="document().added | date: 'yyyy-MM-dd'"
+        class="flex items-center gap-1"
+      >
+        <ng-icon name="lucideCalendarPlus" class="text-sm" />
+        {{ document().added | date: "dd.MM.yyyy" }}
+      </time>
+    }
+    @if (displayFields().includes(DisplayField.MODIFIED) && document().modified) {
+      <time
+        [attr.datetime]="document().modified | date: 'yyyy-MM-dd'"
+        class="flex items-center gap-1"
+      >
+        <ng-icon name="lucidePencil" class="text-sm" />
+        {{ document().modified | date: "dd.MM.yyyy" }}
+      </time>
+    }
+    @if (
+      displayFields().includes(DisplayField.PAGE_COUNT) && document().page_count
+    ) {
+      <span class="flex items-center gap-1">
+        <ng-icon name="lucideFile" class="text-sm" />
+        {{ document().page_count }} page{{
+          document().page_count! > 1 ? "s" : ""
+        }}
+      </span>
+    }
+  </div>
+</article>

@@ -33,6 +33,7 @@
     "@ngrx/signals": "^21.0.1",
     "@spartan-ng/brain": "^0.0.1-alpha.640",
     "@tailwindcss/postcss": "^4.2.0",
+    "@tanstack/angular-table": "^8.21.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-angular": "^20.0.0",

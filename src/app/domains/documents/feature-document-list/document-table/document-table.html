@@ -1,0 +1,110 @@
+<div class="relative w-full overflow-hidden rounded-md border">
+  <div hlmTableContainer>
+    <table hlmTable>
+      <thead hlmTHead>
+        @for (headerGroup of table.getHeaderGroups(); track headerGroup.id) {
+          <tr hlmTr>
+            @for (header of headerGroup.headers; track header.id) {
+              <th hlmTh>
+                @if (!header.isPlaceholder) {
+                  <!-- Checkbox column -->
+                  @if (header.column.id === "select") {
+                    <hlm-checkbox aria-label="Select all" />
+                  } @else {
+                    <div
+                      class="flex items-center gap-1.5"
+                      [class.cursor-pointer]="header.column.getCanSort()"
+                      [class.select-none]="header.column.getCanSort()"
+                      (click)="header.column.toggleSorting()"
+                    >
+                      <ng-container
+                        *flexRender="
+                          header.column.columnDef.header;
+                          props: header.getContext();
+                          let headerCell
+                        "
+                      >
+                        {{ headerCell }}
+                      </ng-container>
+                      @if (header.column.getCanSort()) {
+                        @switch (header.column.getIsSorted()) {
+                          @case ('asc') {
+                            <ng-icon name="lucideArrowUpNarrowWide" class="text-muted-foreground text-xs" />
+                          }
+                          @case ('desc') {
+                            <ng-icon name="lucideArrowDownWideNarrow" class="text-muted-foreground text-xs" />
+                          }
+                          @default {
+                            <ng-icon name="lucideArrowUpDown" class="text-muted-foreground text-xs" />
+                          }
+                        }
+                      }
+                    </div>
+                  }
+                }
+              </th>
+            }
+          </tr>
+        }
+      </thead>
+
+      <tbody hlmTBody>
+        @if (!loading()) {
+          @for (row of table.getRowModel().rows; track row.id) {
+            <tr hlmTr>
+              @for (cell of row.getVisibleCells(); track cell.id) {
+                <td hlmTd>
+                  @if (cell.column.id === "select") {
+                    <hlm-checkbox [attr.aria-label]="'Select row ' + row.id" />
+                  } @else if (cell.column.id === "tags") {
+                    <div class="flex flex-wrap gap-1">
+                      @for (tag of row.original.tags; track tag) {
+                        <span hlmBadge variant="outline" class="text-xs">{{
+                          tag
+                        }}</span>
+                      } @empty {
+                        <span class="text-muted-foreground">—</span>
+                      }
+                    </div>
+                  } @else {
+                    <ng-container
+                      *flexRender="
+                        cell.column.columnDef.cell;
+                        props: cell.getContext();
+                        let renderCell
+                      "
+                    >
+                      {{ renderCell }}
+                    </ng-container>
+                  }
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr hlmTr>
+              <td
+                hlmTd
+                class="h-24 text-center"
+                [attr.colspan]="columns.length"
+              >
+                No documents found.
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td [attr.colspan]="columns.length">
+              <div class="my-3 w-full space-y-3">
+                <hlm-skeleton class="h-10 w-full" />
+                <hlm-skeleton class="h-10 w-full" />
+                <hlm-skeleton class="h-10 w-full" />
+                <hlm-skeleton class="h-10 w-full" />
+                <hlm-skeleton class="h-10 w-full" />
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
