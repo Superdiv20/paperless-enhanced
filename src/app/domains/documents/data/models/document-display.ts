@@ -15,6 +15,11 @@ export enum DisplayField {
   PAGE_COUNT = 'pagecount',
 }
 
+export interface SortField {
+  field: string;
+  name: string;
+}
+
 export const DEFAULT_DISPLAY_FIELDS: { id: DisplayField; name: string }[] = [
   { id: DisplayField.TITLE, name: 'Title' },
   { id: DisplayField.CREATED, name: 'Created' },
@@ -40,7 +45,7 @@ export const DEFAULT_DASHBOARD_DISPLAY_FIELDS: DisplayField[] = [
 
 export const DEFAULT_DASHBOARD_VIEW_PAGE_SIZE = 10;
 
-export const DOCUMENT_SORT_FIELDS: { field: string; name: string }[] = [
+export const DOCUMENT_SORT_FIELDS: SortField[] = [
   { field: 'archive_serial_number', name: 'ASN' },
   { field: 'correspondent__name', name: 'Correspondent' },
   { field: 'title', name: 'Title' },
@@ -53,5 +58,5 @@ export const DOCUMENT_SORT_FIELDS: { field: string; name: string }[] = [
   { field: 'page_count', name: 'Pages' },
 ];
 
-export const DOCUMENT_SORT_FIELDS_FULLTEXT: { field: string; name: string }[] =
+export const DOCUMENT_SORT_FIELDS_FULLTEXT: SortField[] =
   [{ field: 'score', name: 'Search Score' }];

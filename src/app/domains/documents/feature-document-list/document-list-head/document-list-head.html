@@ -12,18 +12,27 @@
     </div>
   </div>
 
-  <!-- Filter Button -->
-  <button
-    hlmBtn
-    variant="outline"
-    size="sm"
-    class="hidden sm:inline-flex"
-    aria-label="Filter documents"
-  >
-    <ng-icon name="lucideFilter" />
-    Filter
-    <span hlmBadge variant="secondary" aria-label="Filter count">0</span>
-  </button>
+  <hlm-sheet side="right">
+    <!-- Filter Button -->
+    <button
+      hlmBtn
+      hlmSheetTrigger
+      variant="outline"
+      size="sm"
+      class="hidden sm:inline-flex"
+      aria-label="Filter documents"
+    >
+      <ng-icon name="lucideFilter" />
+      Filter
+      <span hlmBadge variant="secondary" aria-label="Filter count">0</span>
+    </button>
+
+    <hlm-sheet-content *hlmSheetPortal="let ctx">
+      <hlm-sheet-header> </hlm-sheet-header>
+      <div class="grid flex-1 auto-rows-min gap-6 px-4"></div>
+      <hlm-sheet-footer> </hlm-sheet-footer>
+    </hlm-sheet-content>
+  </hlm-sheet>
 
   <!-- Sort Button -->
   <button

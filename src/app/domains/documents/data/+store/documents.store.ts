@@ -14,22 +14,22 @@ import {
 } from '@shared/utils/with-request-status';
 import { DocumentService } from '../services/document-service';
 import { Document } from '../models/document';
-import { pipe, switchMap, tap } from 'rxjs';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
 import { SearchResult } from '@shared/data/models/search-result';
 import { DisplayMode } from '../models/display-mode';
 import { withLocalStorage } from '@shared/utils/with-local-storage';
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
+  SortField,
 } from '../models/document-display';
+import { FilterRule } from '@shared/data/models/filter-rule';
 
 export interface DocumentsState {
   documents: Document[];
   displayMode: DisplayMode;
   displayFields: typeof DEFAULT_DISPLAY_FIELDS;
-  sortField: { field: string; name: string } | null; // sorting happens on the backend
+  sortField: SortField | null; // sorting happens on the backend
+  filters: FilterRule[];
 }
 
 const initialState: DocumentsState = {
@@ -37,9 +37,10 @@ const initialState: DocumentsState = {
   displayMode: DisplayMode.TABLE,
   displayFields: DEFAULT_DISPLAY_FIELDS, // Default to showing all fields
   sortField: null, // No sorting by default
+  filters: [], // No filters by default
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class DocumentsStore extends signalStore(
   withState(initialState),
   withRequestStatus(),
@@ -49,30 +50,27 @@ export class DocumentsStore extends signalStore(
     'sortField',
   ]),
   withMethods((store, documentService = inject(DocumentService)) => ({
-    loadDocuments: rxMethod<{ ordering?: string } | void>(
-      pipe(
-        tap(() => patchState(store, setPending())),
-        switchMap((params) =>
-          documentService.getDocuments(params ?? {}).pipe(
-            tapResponse({
-              next: (result: SearchResult<Document>) => {
-                console.log('Documents loaded:', result);
-                patchState(store, {
-                  documents: result.results,
-                  ...setFulfilled(),
-                });
-              },
-              error: (err: any) => {
-                patchState(
-                  store,
-                  setError(err?.message || 'Failed to load documents'),
-                );
-              },
-            }),
-          ),
-        ),
-      ),
-    ),
+    async loadDocuments(
+      filters: FilterRule[] = store.filters(),
+      params: { ordering?: string } = {},
+    ) {
+      patchState(store, setPending());
+
+      try {
+        const result: SearchResult<Document> = await documentService.getDocuments(
+          filters,
+          params,
+        );
+        patchState(store, {
+          documents: result.results,
+          ...setFulfilled(),
+        });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to load documents';
+        patchState(store, setError(message));
+      }
+    },
     setDisplayMode(mode: DisplayMode) {
       patchState(store, { displayMode: mode });
     },
@@ -87,14 +85,22 @@ export class DocumentsStore extends signalStore(
     },
     setSortField(field: { field: string; name: string }) {
       patchState(store, { sortField: field });
-      this.loadDocuments({ ordering: field.field });
+      this.loadDocuments(store.filters(), { ordering: field.field });
+    },
+    setFilters(filters: FilterRule[]) {
+      patchState(store, { filters });
+      const sortField = store.sortField();
+      this.loadDocuments(filters, sortField ? { ordering: sortField.field } : {});
     },
   })),
 
   withHooks({
     onInit(store) {
       const sortField = store.sortField();
-      store.loadDocuments(sortField ? { ordering: sortField.field } : undefined);
+      store.loadDocuments(
+        store.filters(),
+        sortField ? { ordering: sortField.field } : {},
+      );
     },
   }),
 ) {}

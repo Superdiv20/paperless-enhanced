@@ -24,6 +24,7 @@ import { DEFAULT_DISPLAY_FIELDS } from '../data/models/document-display';
     provideIcons({
       lucideLoader,
     }),
+    DocumentsStore,
   ],
 })
 export class DocumentList {

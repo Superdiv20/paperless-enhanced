@@ -26,6 +26,7 @@ import {
   DOCUMENT_SORT_FIELDS,
 } from '../../data/models/document-display';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
+import { HlmSheetImports } from '@spartan-ng/helm/sheet';
 
 @Component({
   selector: 'paperless-document-list-head',
@@ -39,6 +40,7 @@ import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
     HlmButtonImports,
     HlmBadgeImports,
     HlmDropdownMenuImports,
+    HlmSheetImports
   ],
   providers: [
     provideIcons({
