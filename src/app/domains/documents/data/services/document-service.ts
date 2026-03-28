@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '@environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { Document } from '../models/document';
 import { SearchResult } from '@shared/data/models/search-result';
@@ -24,12 +24,6 @@ export class DocumentService {
       [key: string]: string | number | boolean | undefined;
     } = {},
   ): Promise<SearchResult<Document>> {
-    const credentials = btoa(
-      `${environment.authUser}:${environment.authPassword}`,
-    );
-    const headers = new HttpHeaders({
-      Authorization: `Basic ${credentials}`,
-    });
     let httpParams = new HttpParams();
 
     for (const rule of filters) {
@@ -45,14 +39,10 @@ export class DocumentService {
       }
     });
 
-    const result$ = this.http.get<SearchResult<Document>>(
-      `${this.apiUrl}/documents/`,
-      {
-        headers,
+    return firstValueFrom(
+      this.http.get<SearchResult<Document>>(`${this.apiUrl}/documents/`, {
         params: httpParams,
-      },
+      }),
     );
-
-    return firstValueFrom(result$);
   }
 }

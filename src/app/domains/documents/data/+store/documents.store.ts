@@ -23,6 +23,9 @@ import {
   SortField,
 } from '../models/document-display';
 import { FilterRule } from '@shared/data/models/filter-rule';
+import { TagsStore } from '@shared/data/+store/tags.store';
+import { CorrespondentsStore } from '@shared/data/+store/correspondents.store';
+import { DocumentTypesStore } from '@shared/data/+store/document-types.store';
 
 export interface DocumentsState {
   documents: Document[];
@@ -40,8 +43,7 @@ const initialState: DocumentsState = {
   filters: [], // No filters by default
 };
 
-@Injectable()
-export class DocumentsStore extends signalStore(
+export const DocumentsStore = signalStore(
   withState(initialState),
   withRequestStatus(),
   withLocalStorage('paperless:documents', [
@@ -57,10 +59,8 @@ export class DocumentsStore extends signalStore(
       patchState(store, setPending());
 
       try {
-        const result: SearchResult<Document> = await documentService.getDocuments(
-          filters,
-          params,
-        );
+        const result: SearchResult<Document> =
+          await documentService.getDocuments(filters, params);
         patchState(store, {
           documents: result.results,
           ...setFulfilled(),
@@ -90,17 +90,25 @@ export class DocumentsStore extends signalStore(
     setFilters(filters: FilterRule[]) {
       patchState(store, { filters });
       const sortField = store.sortField();
-      this.loadDocuments(filters, sortField ? { ordering: sortField.field } : {});
+      this.loadDocuments(
+        filters,
+        sortField ? { ordering: sortField.field } : {},
+      );
     },
   })),
 
   withHooks({
     onInit(store) {
+      const tagsStore = inject(TagsStore);
+      const correspondentsStore = inject(CorrespondentsStore);
+      inject(DocumentTypesStore).loadAllDocumentTypes();
       const sortField = store.sortField();
+      tagsStore.loadAllTags();
+      correspondentsStore.loadAllCorrespondents();
       store.loadDocuments(
         store.filters(),
         sortField ? { ordering: sortField.field } : {},
       );
     },
   }),
-) {}
+);

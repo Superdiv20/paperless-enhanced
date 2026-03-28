@@ -24,12 +24,22 @@
     >
       <ng-icon name="lucideFilter" />
       Filter
-      <span hlmBadge variant="secondary" aria-label="Filter count">0</span>
+
+      @if (filterCount() > 0) {
+        <span hlmBadge variant="secondary" aria-label="Filter count">{{
+          filterCount()
+        }}</span>
+      }
     </button>
 
     <hlm-sheet-content *hlmSheetPortal="let ctx">
-      <hlm-sheet-header> </hlm-sheet-header>
-      <div class="grid flex-1 auto-rows-min gap-6 px-4"></div>
+      <hlm-sheet-header>
+        <h3 hlmSheetTitle>Filters</h3>
+        <p hlmSheetDescription>Narrow down your documents.</p>
+      </hlm-sheet-header>
+      <div class="flex flex-col gap-6 px-4 py-4">
+        <paperless-filter-editor />
+      </div>
       <hlm-sheet-footer> </hlm-sheet-footer>
     </hlm-sheet-content>
   </hlm-sheet>

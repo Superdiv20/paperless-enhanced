@@ -12,6 +12,6 @@ import { classes } from '@spartan-ng/helm/utils';
 })
 export class HlmComboboxChipRemove {
 	constructor() {
-		classes(() => ['-ml-1 opacity-50 hover:opacity-100', buttonVariants({ variant: 'ghost', size: 'icon-xs' })]);
+		classes(() => ['-ml-1 opacity-50 hover:opacity-100', buttonVariants({ variant: null, size: 'icon-xs' })]);
 	}
 }

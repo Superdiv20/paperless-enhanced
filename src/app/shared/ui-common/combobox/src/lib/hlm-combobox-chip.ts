@@ -14,6 +14,8 @@ import { HlmComboboxChipRemove } from './hlm-combobox-chip-remove';
 	hostDirectives: [{ directive: BrnComboboxChip, inputs: ['value'] }],
 	host: {
 		'data-slot': 'combobox-chip',
+		'[style.background-color]': 'color() ?? null',
+		'[style.color]': 'textColor() ?? null',
 	},
 	template: `
 		<ng-content />
@@ -27,11 +29,20 @@ import { HlmComboboxChipRemove } from './hlm-combobox-chip-remove';
 })
 export class HlmComboboxChip {
 	public readonly showRemove = input<boolean, BooleanInput>(true, { transform: booleanAttribute });
+	public readonly color = input<string | undefined>(undefined);
+	public readonly textColor = input<string | undefined>(undefined);
 
 	constructor() {
 		classes(
 			() =>
-				'bg-muted text-foreground flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-sm px-1.5 text-xs font-medium whitespace-nowrap has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 has-data-[slot=combobox-chip-remove]:pr-0',
+				[
+					'flex h-[calc(--spacing(5.5))] w-fit items-center justify-center gap-1 rounded-sm px-1.5 text-xs font-medium whitespace-nowrap',
+					'has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50',
+					'has-data-[slot=combobox-chip-remove]:pr-0',
+					!this.color() && 'bg-muted',
+					!this.textColor() && 'text-foreground',
+				].filter(Boolean).join(' '),
 		);
 	}
 }
+

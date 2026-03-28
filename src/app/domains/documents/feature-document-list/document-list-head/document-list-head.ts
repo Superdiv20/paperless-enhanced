@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -27,6 +28,7 @@ import {
 } from '../../data/models/document-display';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmSheetImports } from '@spartan-ng/helm/sheet';
+import { FilterEditor } from '../../ui/filter-editor/filter-editor';
 
 @Component({
   selector: 'paperless-document-list-head',
@@ -40,7 +42,8 @@ import { HlmSheetImports } from '@spartan-ng/helm/sheet';
     HlmButtonImports,
     HlmBadgeImports,
     HlmDropdownMenuImports,
-    HlmSheetImports
+    HlmSheetImports,
+    FilterEditor,
   ],
   providers: [
     provideIcons({
@@ -60,6 +63,7 @@ export class DocumentListHead {
   DisplayMode = DisplayMode;
 
   protected readonly searchQuery = signal('');
+  protected readonly filterCount = computed(() => this.documentStore.filters().length);
   protected readonly displayMode = this.documentStore.displayMode;
   protected readonly displayFields = this.documentStore.displayFields;
   protected readonly allDisplayFields = DEFAULT_DISPLAY_FIELDS;

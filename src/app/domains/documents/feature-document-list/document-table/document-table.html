@@ -1,7 +1,7 @@
 <div class="relative w-full overflow-hidden rounded-md border">
   <div hlmTableContainer>
     <table hlmTable>
-      <thead hlmTHead>
+      <thead hlmTHead class="bg-sidebar">
         @for (headerGroup of table.getHeaderGroups(); track headerGroup.id) {
           <tr hlmTr>
             @for (header of headerGroup.headers; track header.id) {
@@ -28,14 +28,23 @@
                       </ng-container>
                       @if (header.column.getCanSort()) {
                         @switch (header.column.getIsSorted()) {
-                          @case ('asc') {
-                            <ng-icon name="lucideArrowUpNarrowWide" class="text-muted-foreground text-xs" />
+                          @case ("asc") {
+                            <ng-icon
+                              name="lucideArrowUpNarrowWide"
+                              class="text-muted-foreground text-xs"
+                            />
                           }
-                          @case ('desc') {
-                            <ng-icon name="lucideArrowDownWideNarrow" class="text-muted-foreground text-xs" />
+                          @case ("desc") {
+                            <ng-icon
+                              name="lucideArrowDownWideNarrow"
+                              class="text-muted-foreground text-xs"
+                            />
                           }
                           @default {
-                            <ng-icon name="lucideArrowUpDown" class="text-muted-foreground text-xs" />
+                            <ng-icon
+                              name="lucideArrowUpDown"
+                              class="text-muted-foreground text-xs"
+                            />
                           }
                         }
                       }
