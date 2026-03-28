@@ -177,7 +177,8 @@
       "@spartan-ng/helm/utils": [
         "./src/app/shared/ui-common/utils/src/index.ts"
       ],
-      "@shared/*": ["./src/app/shared/*"]
+      "@shared/*": ["./src/app/shared/*"],
+      "@environments/*": ["./src/environments/*"]
     }
   },
   "angularCompilerOptions": {

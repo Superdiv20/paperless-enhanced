@@ -9,6 +9,9 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "paperless",
+      "i18n": {
+        "sourceLocale": "en-US"
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -23,6 +26,9 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           },
           "configurations": {
@@ -85,6 +91,9 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           }
         }
