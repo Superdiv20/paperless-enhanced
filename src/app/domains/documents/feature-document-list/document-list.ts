@@ -31,7 +31,7 @@ export class DocumentList {
   private readonly documentStore = inject(DocumentsStore);
 
   public readonly isLoading = this.documentStore.isPending;
-  public readonly documents = this.documentStore.documents;
+  public readonly documents = this.documentStore.resolvedDocuments;
   public readonly viewMode = this.documentStore.displayMode;
   public readonly displayFieldIds = computed(() =>
     this.documentStore.displayFields().map((f) => f.id),

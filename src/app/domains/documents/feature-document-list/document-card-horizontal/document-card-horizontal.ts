@@ -11,7 +11,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmTooltipImports } from '@spartan-ng/helm/tooltip';
-import { Document } from '../../data/models/document';
+import { Document, ResolvedDocument } from '../../data/models/document';
 import {
   lucideCalendar,
   lucideCalendarFold,
@@ -57,7 +57,7 @@ import { DisplayField } from '../../data/models/document-display';
   ],
 })
 export class DocumentCardHorizontal {
-  public readonly document = input.required<Document>();
+  public readonly document = input.required<ResolvedDocument>();
   public readonly displayFields = input.required<DisplayField[]>();
 
   protected readonly DisplayField = DisplayField;

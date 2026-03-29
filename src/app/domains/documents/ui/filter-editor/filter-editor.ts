@@ -9,15 +9,19 @@ import { DocumentsStore } from '../../data/+store/documents.store';
 import { TagsStore } from '@shared/data/+store/tags.store';
 import { CorrespondentsStore } from '@shared/data/+store/correspondents.store';
 import { DocumentTypesStore } from '@shared/data/+store/document-types.store';
+import { StoragePathsStore } from '@shared/data/+store/storage-paths.store';
 import { Tag } from '@shared/data/models/tag';
 import { Correspondet } from '@shared/data/models/correspondent';
 import { DocumentType } from '@shared/data/models/document-type';
+import { StoragePath } from '@shared/data/models/storage-path';
 import { FilterRule } from '@shared/data/models/filter-rule';
 import {
   FILTER_DOES_NOT_HAVE_CORRESPONDENT,
   FILTER_HAS_CORRESPONDENT_ANY,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
   FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+  FILTER_HAS_STORAGE_PATH_ANY,
   FILTER_HAS_TAGS_ALL,
   FILTER_HAS_TAGS_ANY,
 } from '@shared/data/models/filter-rule-type';
@@ -26,7 +30,12 @@ import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmToggleGroupImports } from '@spartan-ng/helm/toggle-group';
 import { ModeChangeConfig } from './filter-mode-change.config';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideTag, lucideUser, lucideFileType } from '@ng-icons/lucide';
+import {
+  lucideTag,
+  lucideUser,
+  lucideFileType,
+  lucideFolderOpen,
+} from '@ng-icons/lucide';
 
 const TAG_RULE_TYPES = [FILTER_HAS_TAGS_ALL, FILTER_HAS_TAGS_ANY];
 const CORRESPONDENT_RULE_TYPES = [
@@ -36,6 +45,10 @@ const CORRESPONDENT_RULE_TYPES = [
 const DOCUMENT_TYPE_RULE_TYPES = [
   FILTER_HAS_DOCUMENT_TYPE_ANY,
   FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+];
+const STORAGE_PATH_RULE_TYPES = [
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
 ];
 
 @Component({
@@ -49,6 +62,7 @@ const DOCUMENT_TYPE_RULE_TYPES = [
       lucideTag,
       lucideUser,
       lucideFileType,
+      lucideFolderOpen,
     }),
   ],
 })
@@ -57,18 +71,25 @@ export class FilterEditor {
   private readonly tagsStore = inject(TagsStore);
   private readonly correspondentsStore = inject(CorrespondentsStore);
   private readonly documentTypesStore = inject(DocumentTypesStore);
+  private readonly storagePathsStore = inject(StoragePathsStore);
 
   protected readonly tags = this.tagsStore.tags;
   protected readonly correspondents = this.correspondentsStore.correspondents;
   protected readonly documentTypes = this.documentTypesStore.documentTypes;
+  protected readonly storagePaths = this.storagePathsStore.storagePaths;
 
   public readonly FILTER_HAS_CORRESPONDENT_ANY = FILTER_HAS_CORRESPONDENT_ANY;
   public readonly FILTER_DOES_NOT_HAVE_CORRESPONDENT =
     FILTER_DOES_NOT_HAVE_CORRESPONDENT;
 
   protected readonly tagMode = signal<'all' | 'any'>('all');
-  protected readonly correspondentMode = signal<'include' | 'exclude'>('include');
-  protected readonly documentTypeMode = signal<'include' | 'exclude'>('include');
+  protected readonly correspondentMode = signal<'include' | 'exclude'>(
+    'include',
+  );
+  protected readonly documentTypeMode = signal<'include' | 'exclude'>(
+    'include',
+  );
+  protected readonly storagePathMode = signal<'include' | 'exclude'>('include');
 
   private readonly tagRuleType = computed(() =>
     this.tagMode() === 'all' ? FILTER_HAS_TAGS_ALL : FILTER_HAS_TAGS_ANY,
@@ -84,6 +105,12 @@ export class FilterEditor {
     this.documentTypeMode() === 'include'
       ? FILTER_HAS_DOCUMENT_TYPE_ANY
       : FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  );
+
+  private readonly storagePathRuleType = computed(() =>
+    this.storagePathMode() === 'include'
+      ? FILTER_HAS_STORAGE_PATH_ANY
+      : FILTER_DOES_NOT_HAVE_STORAGE_PATH,
   );
 
   // Derived from the store — survives sheet close/reopen
@@ -115,6 +142,16 @@ export class FilterEditor {
       .filter((r) => r.rule_type === ruleType)
       .map((r) => Number(r.value));
     return all.filter((dt) => ids.includes(dt.id!));
+  });
+
+  protected readonly selectedStoragePaths = computed<StoragePath[]>(() => {
+    const all = this.storagePathsStore.storagePaths();
+    const ruleType = this.storagePathRuleType();
+    const ids = this.documentsStore
+      .filters()
+      .filter((r) => r.rule_type === ruleType)
+      .map((r) => Number(r.value));
+    return all.filter((sp) => ids.includes(sp.id!));
   });
 
   protected onTagModeChange(mode: 'all' | 'any'): void {
@@ -178,6 +215,21 @@ export class FilterEditor {
     ]);
   }
 
+  protected onStoragePathsChange(storagePaths: StoragePath[]): void {
+    const nonStoragePathRules = this.documentsStore
+      .filters()
+      .filter((r) => !STORAGE_PATH_RULE_TYPES.includes(r.rule_type));
+    const ruleType = this.storagePathRuleType();
+    const storagePathRules: FilterRule[] = storagePaths.map((sp) => ({
+      rule_type: ruleType,
+      value: String(sp.id),
+    }));
+    this.documentsStore.setFilters([
+      ...nonStoragePathRules,
+      ...storagePathRules,
+    ]);
+  }
+
   protected onCorrespondentModeChange(mode: 'include' | 'exclude'): void {
     this.onModeChange(mode, {
       ruleTypes: CORRESPONDENT_RULE_TYPES,
@@ -196,6 +248,15 @@ export class FilterEditor {
     });
   }
 
+  protected onStoragePathModeChange(mode: 'include' | 'exclude'): void {
+    this.onModeChange(mode, {
+      ruleTypes: STORAGE_PATH_RULE_TYPES,
+      includeRuleType: FILTER_HAS_STORAGE_PATH_ANY,
+      excludeRuleType: FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+      modeSignal: this.storagePathMode,
+    });
+  }
+
   protected tagLabel(tag: Tag): string {
     return tag.name ?? '';
   }
@@ -206,6 +267,10 @@ export class FilterEditor {
 
   protected documentTypeLabel(documentType: DocumentType): string {
     return documentType.name ?? '';
+  }
+
+  protected storagePathLabel(storagePath: StoragePath): string {
+    return storagePath.name ?? '';
   }
 
   /**

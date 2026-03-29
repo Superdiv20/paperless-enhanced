@@ -1,7 +1,7 @@
 <article
   hlmCard
   size="sm"
-  class="group/item cursor-pointer transition-shadow hover:shadow-md max-w-xs"
+  class="group/item cursor-pointer transition-shadow hover:shadow-md h-full max-w-xs"
   [attr.aria-label]="'Document: ' + document().title"
 >
   <!-- Thumbnail: -mt-6 compensates for the card's pt-6 so it bleeds to the top edge -->
@@ -33,23 +33,37 @@
 
   <!-- Header: correspondent + type badge above title -->
   <div hlmCardHeader>
-    <div class="flex flex-wrap items-center gap-1.5">
-      @if (
-        displayFields().includes(DisplayField.CORRESPONDENT) &&
-        document().correspondent
-      ) {
-        <span class="text-xs font-medium text-primary"
-          >Correspondent {{ document().correspondent }}</span
-        >
-      }
-      @if (
-        displayFields().includes(DisplayField.DOCUMENT_TYPE) &&
-        document().document_type
-      ) {
-        <span hlmBadge variant="secondary"
-          >Type {{ document().document_type }}</span
-        >
-      }
+    <div class="flex justify-between flex-wrap items-center mb-1">
+      <div class="flex items-center gap-1.5">
+        @if (
+          displayFields().includes(DisplayField.CORRESPONDENT) &&
+          document().correspondent
+        ) {
+          <span class="text-xs font-medium text-primary">{{
+            document().correspondent!.name
+          }}</span>
+        }
+        @if (
+          displayFields().includes(DisplayField.DOCUMENT_TYPE) &&
+          document().document_type
+        ) {
+          <span hlmBadge variant="secondary">{{
+            document().document_type!.name
+          }}</span>
+        }
+      </div>
+      <div class="text-xs text-muted-foreground">
+        @if (
+          displayFields().includes(DisplayField.PAGE_COUNT) &&
+          document().page_count
+        ) {
+          <span class="flex items-center gap-1.5">
+            <ng-icon name="lucideFile" class="shrink-0" />
+            {{ document().page_count }}
+            {{ document().page_count! > 1 ? "pages" : "page" }}
+          </span>
+        }
+      </div>
     </div>
     <h3 class="font-semibold leading-tight">{{ document().title }}</h3>
   </div>
@@ -74,7 +88,9 @@
         {{ document().added | date: "dd.MM.yyyy" }}
       </time>
     }
-    @if (displayFields().includes(DisplayField.MODIFIED) && document().modified) {
+    @if (
+      displayFields().includes(DisplayField.MODIFIED) && document().modified
+    ) {
       <time
         [attr.datetime]="document().modified | date: 'yyyy-MM-dd'"
         class="flex items-center gap-2"
@@ -84,20 +100,17 @@
       </time>
     }
     @if (
-      displayFields().includes(DisplayField.PAGE_COUNT) && document().page_count
-    ) {
-      <span class="flex items-center gap-2">
-        <ng-icon name="lucideFile" class="shrink-0" />
-        {{ document().page_count }}
-        {{ document().page_count! > 1 ? "pages" : "page" }}
-      </span>
-    }
-    @if (
       displayFields().includes(DisplayField.TAGS) && document().tags?.length
     ) {
       <div class="flex flex-wrap gap-1 pt-1">
-        @for (tag of document().tags; track tag) {
-          <span hlmBadge variant="outline">Tag {{ tag }}</span>
+        @for (tag of document().tags; track tag.id) {
+          <span
+            hlmBadge
+            variant="outline"
+            [style.background-color]="tag.color ?? null"
+            [style.color]="tag.text_color ?? null"
+            >{{ tag.name }}</span
+          >
         }
       </div>
     }

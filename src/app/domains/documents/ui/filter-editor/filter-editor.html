@@ -3,7 +3,7 @@
   <div class="flex flex-col gap-2">
     <label hlmLabel i18n>
       <ng-icon name="lucideTag"></ng-icon>
-      Tags</label
+      {{ "Tags" }}</label
     >
     <hlm-toggle-group
       type="single"
@@ -64,7 +64,7 @@
   <div class="flex flex-col gap-2">
     <label hlmLabel i18n>
       <ng-icon name="lucideUser"></ng-icon>
-      Correspondents</label
+      {{ "Correspondents" }}</label
     >
     <hlm-toggle-group
       type="single"
@@ -127,7 +127,7 @@
   <div class="flex flex-col gap-2">
     <label hlmLabel i18n>
       <ng-icon name="lucideFileType"></ng-icon>
-      Document Type</label
+      {{ "Document Types" }}</label
     >
     <hlm-toggle-group
       type="single"
@@ -176,6 +176,66 @@
           @for (documentType of documentTypes(); track documentType.id) {
             <hlm-combobox-item [value]="documentType">{{
               documentType.name
+            }}</hlm-combobox-item>
+          }
+        </ul>
+      </hlm-combobox-content>
+    </hlm-combobox-multiple>
+  </div>
+
+  <!-- Storage Paths -->
+  <div class="flex flex-col gap-2">
+    <label hlmLabel i18n>
+      <ng-icon name="lucideFolderOpen"></ng-icon>
+      {{ "Storage Paths" }}</label
+    >
+    <hlm-toggle-group
+      type="single"
+      variant="outline"
+      size="sm"
+      [value]="storagePathMode()"
+      (valueChange)="onStoragePathModeChange($any($event))"
+      class="w-full"
+    >
+      <button
+        hlmToggleGroupItem
+        value="include"
+        aria-label="Include storage paths"
+        class="w-1/2"
+      >
+        <ng-container i18n>Include</ng-container>
+      </button>
+      <button
+        hlmToggleGroupItem
+        value="exclude"
+        aria-label="Exclude storage paths"
+        class="w-1/2"
+      >
+        <ng-container i18n>Exclude</ng-container>
+      </button>
+    </hlm-toggle-group>
+    <hlm-combobox-multiple
+      [value]="selectedStoragePaths()"
+      [itemToString]="storagePathLabel"
+      (valueChange)="onStoragePathsChange($any($event))"
+    >
+      <hlm-combobox-chips>
+        @for (storagePath of selectedStoragePaths(); track storagePath.id) {
+          <hlm-combobox-chip [value]="storagePath">{{
+            storagePath.name
+          }}</hlm-combobox-chip>
+        }
+        <input hlmComboboxChipInput placeholder="Search storage paths..." />
+      </hlm-combobox-chips>
+
+      <hlm-combobox-content *hlmComboboxPortal>
+        <ul hlmComboboxList>
+          <hlm-combobox-empty>
+            <ng-container i18n>No storage paths found.</ng-container>
+          </hlm-combobox-empty>
+          @for (storagePath of storagePaths(); track storagePath.id) {
+            <hlm-combobox-item [value]="storagePath">{{
+              storagePath.name
             }}</hlm-combobox-item>
           }
         </ul>

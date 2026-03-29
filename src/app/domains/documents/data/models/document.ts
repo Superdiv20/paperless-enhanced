@@ -1,5 +1,9 @@
 // documents/models/document.model.ts
 import { OwnedResource } from '@shared/data/models/permission';
+import { Tag } from '@shared/data/models/tag';
+import { Correspondet } from '@shared/data/models/correspondent';
+import { DocumentType } from '@shared/data/models/document-type';
+import { StoragePath } from '@shared/data/models/storage-path';
 import { CustomFieldInstance } from './custom-field';
 import { DocumentNote } from './document-note';
 
@@ -39,3 +43,11 @@ export interface Document extends OwnedResource {
   /** @internal frontend tracking only */
   __changedFields?: string[];
 }
+
+/** Document with IDs resolved to full objects from the reference stores. */
+export type ResolvedDocument = Omit<Document, 'correspondent' | 'document_type' | 'storage_path' | 'tags'> & {
+  correspondent?: Correspondet;
+  document_type?: DocumentType;
+  storage_path?: StoragePath;
+  tags?: Tag[];
+};

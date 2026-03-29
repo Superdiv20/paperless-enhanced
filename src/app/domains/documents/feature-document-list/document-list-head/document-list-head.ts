@@ -16,6 +16,7 @@ import {
   lucideList,
   lucideSearch,
   lucideTable,
+  lucideX,
 } from '@ng-icons/lucide';
 import { DocumentsStore } from '../../data/+store/documents.store';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
@@ -29,6 +30,7 @@ import {
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmSheetImports } from '@spartan-ng/helm/sheet';
 import { FilterEditor } from '../../ui/filter-editor/filter-editor';
+import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
 
 @Component({
   selector: 'paperless-document-list-head',
@@ -44,6 +46,7 @@ import { FilterEditor } from '../../ui/filter-editor/filter-editor';
     HlmDropdownMenuImports,
     HlmSheetImports,
     FilterEditor,
+    HlmSeparatorImports,
   ],
   providers: [
     provideIcons({
@@ -54,6 +57,7 @@ import { FilterEditor } from '../../ui/filter-editor/filter-editor';
       lucideFilter,
       lucideArrowUpDown,
       lucideColumns3Cog,
+      lucideX,
     }),
   ],
 })
@@ -63,35 +67,41 @@ export class DocumentListHead {
   DisplayMode = DisplayMode;
 
   protected readonly searchQuery = signal('');
-  protected readonly filterCount = computed(() => this.documentStore.filters().length);
+  protected readonly filterCount = computed(
+    () => this.documentStore.filters().length,
+  );
   protected readonly displayMode = this.documentStore.displayMode;
   protected readonly displayFields = this.documentStore.displayFields;
   protected readonly allDisplayFields = DEFAULT_DISPLAY_FIELDS;
   protected readonly sortFields = DOCUMENT_SORT_FIELDS;
   protected readonly currentSortField = this.documentStore.sortField;
 
-  onDisplayModeChange(mode: DisplayMode) {
+  protected onDisplayModeChange(mode: DisplayMode) {
     this.documentStore.setDisplayMode(mode);
   }
 
-  onSearchChange(query: string) {
+  protected onSearchChange(query: string) {
     this.searchQuery.set(query);
   }
 
-  isDisplayFieldActive(fieldId: DisplayField): boolean {
+  protected isDisplayFieldActive(fieldId: DisplayField): boolean {
     return this.displayFields().some((f) => f.id === fieldId);
   }
 
-  toggleDisplayField(fieldId: DisplayField): void {
+  protected toggleDisplayField(fieldId: DisplayField): void {
     this.documentStore.toggleDisplayField(fieldId);
   }
 
-  isSortFieldActive(field: { field: string; name: string }): boolean {
+  protected isSortFieldActive(field: { field: string; name: string }): boolean {
     const current = this.currentSortField();
     return current ? current.field === field.field : false;
   }
 
-  setSortField(field: { field: string; name: string }): void {
+  protected setSortField(field: { field: string; name: string }): void {
     this.documentStore.setSortField(field);
+  }
+
+  protected clearFilters(): void {
+    this.documentStore.setFilters([]);
   }
 }

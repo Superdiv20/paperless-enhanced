@@ -32,15 +32,21 @@
       }
     </button>
 
-    <hlm-sheet-content *hlmSheetPortal="let ctx">
+    <hlm-sheet-content *hlmSheetPortal="let ctx" class="p-2">
       <hlm-sheet-header>
         <h3 hlmSheetTitle>Filters</h3>
         <p hlmSheetDescription>Narrow down your documents.</p>
       </hlm-sheet-header>
+      <hlm-separator></hlm-separator>
       <div class="flex flex-col gap-6 px-4 py-4">
         <paperless-filter-editor />
       </div>
-      <hlm-sheet-footer> </hlm-sheet-footer>
+      <hlm-sheet-footer>
+        <button hlmBtn variant="destructive" size="sm" (click)="clearFilters()">
+          <ng-icon name="lucideX"></ng-icon>
+          <ng-container i18n>Clear Filters</ng-container>
+        </button>
+      </hlm-sheet-footer>
     </hlm-sheet-content>
   </hlm-sheet>
 

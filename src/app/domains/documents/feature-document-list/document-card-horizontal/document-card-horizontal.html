@@ -46,7 +46,7 @@
         document().correspondent
       ) {
         <span class="text-xs font-medium text-primary"
-          >Correspondent {{ document().correspondent }}</span
+          >{{ document().correspondent!.name }}</span
         >
       }
       @if (
@@ -54,7 +54,7 @@
         document().document_type
       ) {
         <span hlmBadge variant="secondary"
-          >Type {{ document().document_type }}</span
+          >{{ document().document_type!.name }}</span
         >
       }
     </div>
@@ -89,8 +89,14 @@
       displayFields().includes(DisplayField.TAGS) && document().tags?.length
     ) {
       <div class="flex flex-wrap gap-1">
-        @for (tag of document().tags; track tag) {
-          <span hlmBadge variant="outline">Tag {{ tag }}</span>
+        @for (tag of document().tags; track tag.id) {
+          <span
+            hlmBadge
+            variant="outline"
+            [style.background-color]="tag.color ?? null"
+            [style.color]="tag.text_color ?? null"
+            >{{ tag.name }}</span
+          >
         }
       </div>
     }

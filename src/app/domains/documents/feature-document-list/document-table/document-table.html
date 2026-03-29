@@ -67,10 +67,15 @@
                     <hlm-checkbox [attr.aria-label]="'Select row ' + row.id" />
                   } @else if (cell.column.id === "tags") {
                     <div class="flex flex-wrap gap-1">
-                      @for (tag of row.original.tags; track tag) {
-                        <span hlmBadge variant="outline" class="text-xs">{{
-                          tag
-                        }}</span>
+                      @for (tag of row.original.tags; track tag.id) {
+                        <span
+                          hlmBadge
+                          variant="outline"
+                          class="text-xs"
+                          [style.background-color]="tag.color ?? null"
+                          [style.color]="tag.text_color ?? null"
+                          >{{ tag.name }}</span
+                        >
                       } @empty {
                         <span class="text-muted-foreground">—</span>
                       }
