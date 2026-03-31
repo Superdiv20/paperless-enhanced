@@ -5,31 +5,6 @@
       <ng-icon name="lucideTag"></ng-icon>
       {{ "Tags" }}</label
     >
-    <hlm-toggle-group
-      type="single"
-      variant="outline"
-      size="sm"
-      [value]="tagMode()"
-      (valueChange)="onTagModeChange($any($event))"
-      class="w-full"
-    >
-      <button
-        hlmToggleGroupItem
-        value="all"
-        aria-label="Toggle tags all"
-        class="w-1/2"
-      >
-        <ng-container i18n>All</ng-container>
-      </button>
-      <button
-        hlmToggleGroupItem
-        value="any"
-        aria-label="Toggle tags any"
-        class="w-1/2"
-      >
-        <ng-container i18n>Any</ng-container>
-      </button>
-    </hlm-toggle-group>
     <hlm-combobox-multiple
       [value]="selectedTags()"
       [itemToString]="tagLabel"
@@ -58,6 +33,18 @@
         </ul>
       </hlm-combobox-content>
     </hlm-combobox-multiple>
+    @if (selectedTags().length > 0) {
+      <div class="flex items-center gap-2">
+        <hlm-switch
+          [checked]="tagMode() === 'any'"
+          aria-label="Match any tag"
+          (checkedChange)="onTagModeChange($event ? 'any' : 'all')"
+        />
+        <span class="text-muted-foreground text-sm" i18n>
+          {{ tagMode() === "any" ? "Match any tag" : "Match all tags" }}
+        </span>
+      </div>
+    }
   </div>
 
   <!-- Correspondents -->
@@ -66,31 +53,6 @@
       <ng-icon name="lucideUser"></ng-icon>
       {{ "Correspondents" }}</label
     >
-    <hlm-toggle-group
-      type="single"
-      variant="outline"
-      size="sm"
-      [value]="correspondentMode()"
-      (valueChange)="onCorrespondentModeChange($any($event))"
-      class="w-full"
-    >
-      <button
-        hlmToggleGroupItem
-        value="include"
-        aria-label="Include correspondents"
-        class="w-1/2"
-      >
-        <ng-container i18n>Include</ng-container>
-      </button>
-      <button
-        hlmToggleGroupItem
-        value="exclude"
-        aria-label="Exclude correspondents"
-        class="w-1/2"
-      >
-        <ng-container i18n>Exclude</ng-container>
-      </button>
-    </hlm-toggle-group>
     <hlm-combobox-multiple
       [value]="selectedCorrespondents()"
       [itemToString]="correspondentLabel"
@@ -121,6 +83,24 @@
         </ul>
       </hlm-combobox-content>
     </hlm-combobox-multiple>
+    @if (selectedCorrespondents().length > 0) {
+      <div class="flex items-center gap-2">
+        <hlm-switch
+          [checked]="correspondentMode() === 'exclude'"
+          aria-label="Exclude correspondents"
+          (checkedChange)="
+            onCorrespondentModeChange($event ? 'exclude' : 'include')
+          "
+        />
+        <span class="text-muted-foreground text-sm" i18n>
+          {{
+            correspondentMode() === "exclude"
+              ? "Exclude selected"
+              : "Include selected"
+          }}
+        </span>
+      </div>
+    }
   </div>
 
   <!-- Document Types -->
@@ -129,31 +109,6 @@
       <ng-icon name="lucideFileType"></ng-icon>
       {{ "Document Types" }}</label
     >
-    <hlm-toggle-group
-      type="single"
-      variant="outline"
-      size="sm"
-      [value]="documentTypeMode()"
-      (valueChange)="onDocumentTypeModeChange($any($event))"
-      class="w-full"
-    >
-      <button
-        hlmToggleGroupItem
-        value="include"
-        aria-label="Include document types"
-        class="w-1/2"
-      >
-        <ng-container i18n>Include</ng-container>
-      </button>
-      <button
-        hlmToggleGroupItem
-        value="exclude"
-        aria-label="Exclude document types"
-        class="w-1/2"
-      >
-        <ng-container i18n>Exclude</ng-container>
-      </button>
-    </hlm-toggle-group>
     <hlm-combobox-multiple
       [value]="selectedDocumentTypes()"
       [itemToString]="documentTypeLabel"
@@ -181,6 +136,24 @@
         </ul>
       </hlm-combobox-content>
     </hlm-combobox-multiple>
+    @if (selectedDocumentTypes().length > 0) {
+      <div class="flex items-center gap-2">
+        <hlm-switch
+          [checked]="documentTypeMode() === 'exclude'"
+          aria-label="Exclude document types"
+          (checkedChange)="
+            onDocumentTypeModeChange($event ? 'exclude' : 'include')
+          "
+        />
+        <span class="text-muted-foreground text-sm" i18n>
+          {{
+            documentTypeMode() === "exclude"
+              ? "Exclude selected"
+              : "Include selected"
+          }}
+        </span>
+      </div>
+    }
   </div>
 
   <!-- Storage Paths -->
@@ -189,31 +162,6 @@
       <ng-icon name="lucideFolderOpen"></ng-icon>
       {{ "Storage Paths" }}</label
     >
-    <hlm-toggle-group
-      type="single"
-      variant="outline"
-      size="sm"
-      [value]="storagePathMode()"
-      (valueChange)="onStoragePathModeChange($any($event))"
-      class="w-full"
-    >
-      <button
-        hlmToggleGroupItem
-        value="include"
-        aria-label="Include storage paths"
-        class="w-1/2"
-      >
-        <ng-container i18n>Include</ng-container>
-      </button>
-      <button
-        hlmToggleGroupItem
-        value="exclude"
-        aria-label="Exclude storage paths"
-        class="w-1/2"
-      >
-        <ng-container i18n>Exclude</ng-container>
-      </button>
-    </hlm-toggle-group>
     <hlm-combobox-multiple
       [value]="selectedStoragePaths()"
       [itemToString]="storagePathLabel"
@@ -241,5 +189,23 @@
         </ul>
       </hlm-combobox-content>
     </hlm-combobox-multiple>
+    @if (selectedStoragePaths().length > 0) {
+      <div class="flex items-center gap-2">
+        <hlm-switch
+          [checked]="storagePathMode() === 'exclude'"
+          aria-label="Exclude storage paths"
+          (checkedChange)="
+            onStoragePathModeChange($event ? 'exclude' : 'include')
+          "
+        />
+        <span class="text-muted-foreground text-sm" i18n>
+          {{
+            storagePathMode() === "exclude"
+              ? "Exclude selected"
+              : "Include selected"
+          }}
+        </span>
+      </div>
+    }
   </div>
 </div>

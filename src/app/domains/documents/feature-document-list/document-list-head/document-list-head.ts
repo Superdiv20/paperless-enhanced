@@ -10,10 +10,13 @@ import { HlmToggleGroupImports } from '@spartan-ng/helm/toggle-group';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideArrowUpDown,
+  lucideCalendar,
+  lucideCalendarDays,
   lucideColumns3Cog,
   lucideFilter,
   lucideLayoutGrid,
   lucideList,
+  lucideSave,
   lucideSearch,
   lucideTable,
   lucideX,
@@ -31,6 +34,12 @@ import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmSheetImports } from '@spartan-ng/helm/sheet';
 import { FilterEditor } from '../../ui/filter-editor/filter-editor';
 import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
+import { HlmCalendarImports } from '@spartan-ng/helm/calendar';
+import {
+  DatePreset,
+  dateRangeForPreset,
+} from '../../data/models/document-filters';
 
 @Component({
   selector: 'paperless-document-list-head',
@@ -47,6 +56,9 @@ import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
     HlmSheetImports,
     FilterEditor,
     HlmSeparatorImports,
+    HlmDialogImports,
+    HlmCalendarImports,
+    HlmSeparatorImports
   ],
   providers: [
     provideIcons({
@@ -58,6 +70,8 @@ import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
       lucideArrowUpDown,
       lucideColumns3Cog,
       lucideX,
+      lucideSave,
+      lucideCalendarDays,
     }),
   ],
 })
@@ -66,9 +80,84 @@ export class DocumentListHead {
 
   DisplayMode = DisplayMode;
 
+  protected readonly minDate = new Date(2000, 0, 1);
+  protected readonly maxDate = new Date(2100, 11, 31);
+
+  // Dialog-local pending date state (written to store on Apply)
+  protected readonly dialogDateField = signal<'created' | 'added'>('created');
+  protected readonly dialogDatePreset = signal<DatePreset | null>(null);
+  protected readonly dialogDateStart = signal<Date | null>(null);
+  protected readonly dialogDateEnd = signal<Date | null>(null);
+
+  protected readonly isDateFilterActive = computed(() => {
+    const f = this.documentStore.documentFilters();
+    const cd = f.createdDate;
+    const ad = f.addedDate;
+    return cd.preset !== null || cd.from !== null ||
+           ad.preset !== null || ad.from !== null;
+  });
+
+  protected onDateDialogOpen(): void {
+    const f = this.documentStore.documentFilters();
+    const date = this.dialogDateField() === 'created' ? f.createdDate : f.addedDate;
+    this.dialogDatePreset.set(date.preset);
+    this.dialogDateStart.set(date.from ? new Date(date.from) : null);
+    this.dialogDateEnd.set(date.to ? new Date(date.to) : null);
+  }
+
+  protected onDialogDateFieldChange(field: 'created' | 'added'): void {
+    this.dialogDateField.set(field);
+    const f = this.documentStore.documentFilters();
+    const date = field === 'created' ? f.createdDate : f.addedDate;
+    this.dialogDatePreset.set(date.preset);
+    this.dialogDateStart.set(date.from ? new Date(date.from) : null);
+    this.dialogDateEnd.set(date.to ? new Date(date.to) : null);
+  }
+
+  protected onDialogPresetChange(preset: string | null): void {
+    if (!preset) {
+      this.dialogDatePreset.set(null);
+      this.dialogDateStart.set(null);
+      this.dialogDateEnd.set(null);
+      return;
+    }
+    const p = preset as DatePreset;
+    const range = dateRangeForPreset(p);
+    this.dialogDatePreset.set(p);
+    this.dialogDateStart.set(new Date(range.from));
+    this.dialogDateEnd.set(new Date(range.to));
+  }
+
+  protected onCalendarStartChange(date: Date | undefined): void {
+    this.dialogDatePreset.set(null);
+    this.dialogDateStart.set(date ?? null);
+  }
+
+  protected onCalendarEndChange(date: Date | undefined): void {
+    this.dialogDatePreset.set(null);
+    this.dialogDateEnd.set(date ?? null);
+  }
+
+  protected applyDateFilter(): void {
+    const field = this.dialogDateField();
+    const preset = this.dialogDatePreset();
+    if (preset) {
+      this.documentStore.setDateFilter(field, preset);
+      return;
+    }
+    const start = this.dialogDateStart();
+    const end = this.dialogDateEnd();
+    if (start && end) {
+      const fmt = (d: Date) => d.toISOString().split('T')[0];
+      this.documentStore.setCustomDateFilter(field, fmt(start), fmt(end));
+    } else {
+      this.documentStore.clearDateFilter(field);
+    }
+  }
+
   protected readonly searchQuery = signal('');
   protected readonly filterCount = computed(
-    () => this.documentStore.filters().length,
+    () => this.documentStore.filterRules().length,
   );
   protected readonly displayMode = this.documentStore.displayMode;
   protected readonly displayFields = this.documentStore.displayFields;
@@ -102,6 +191,6 @@ export class DocumentListHead {
   }
 
   protected clearFilters(): void {
-    this.documentStore.setFilters([]);
+    this.documentStore.clearAllFilters();
   }
 }

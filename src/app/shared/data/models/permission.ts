@@ -1,5 +1,5 @@
 // shared/models/permissions.model.ts
-export interface Permissions {
+export type Permissions = {
   view: {
     users: number[];
     groups: number[];
@@ -10,7 +10,7 @@ export interface Permissions {
   };
 }
 
-export interface OwnedResource {
+export type OwnedResource = {
   owner?: number;
   permissions?: Permissions;
   user_can_change?: boolean;

@@ -45,7 +45,7 @@ export const MATCHING_ALGORITHMS = [
   },
 ];
 
-export interface Matching {
+export type Matching = {
   id?: number;
   name?: string;
   slug?: string;

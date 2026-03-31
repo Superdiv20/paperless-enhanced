@@ -24,36 +24,102 @@ import {
   SortField,
 } from '../models/document-display';
 import { FilterRule } from '@shared/data/models/filter-rule';
+import {
+  FILTER_HAS_TAGS_ALL,
+  FILTER_HAS_TAGS_ANY,
+  FILTER_HAS_CORRESPONDENT_ANY,
+  FILTER_DOES_NOT_HAVE_CORRESPONDENT,
+  FILTER_HAS_DOCUMENT_TYPE_ANY,
+  FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE,
+  FILTER_HAS_STORAGE_PATH_ANY,
+  FILTER_DOES_NOT_HAVE_STORAGE_PATH,
+  FILTER_CREATED_FROM,
+  FILTER_CREATED_TO,
+  FILTER_ADDED_FROM,
+  FILTER_ADDED_TO,
+} from '@shared/data/models/filter-rule-type';
 import { TagsStore } from '@shared/data/+store/tags.store';
 import { CorrespondentsStore } from '@shared/data/+store/correspondents.store';
 import { DocumentTypesStore } from '@shared/data/+store/document-types.store';
 import { StoragePathsStore } from '@shared/data/+store/storage-paths.store';
 import { computed } from '@angular/core';
+import {
+  DatePreset,
+  DocumentFilters,
+  dateRangeForPreset,
+  initialDocumentFilters,
+} from '../models/document-filters';
 
 export interface DocumentsState {
   documents: Document[];
   displayMode: DisplayMode;
   displayFields: typeof DEFAULT_DISPLAY_FIELDS;
-  sortField: SortField | null; // sorting happens on the backend
-  filters: FilterRule[];
+  sortField: SortField | null;
+  documentFilters: DocumentFilters;
 }
 
 const initialState: DocumentsState = {
   documents: [],
   displayMode: DisplayMode.TABLE,
-  displayFields: DEFAULT_DISPLAY_FIELDS, // Default to showing all fields
-  sortField: null, // No sorting by default
-  filters: [], // No filters by default
+  displayFields: DEFAULT_DISPLAY_FIELDS,
+  sortField: null,
+  documentFilters: initialDocumentFilters,
 };
+
+function deriveFilterRules(f: DocumentFilters): FilterRule[] {
+  const rules: FilterRule[] = [];
+
+  const tagRuleType =
+    f.tags.mode === 'all' ? FILTER_HAS_TAGS_ALL : FILTER_HAS_TAGS_ANY;
+  for (const id of f.tags.ids) {
+    rules.push({ rule_type: tagRuleType, value: String(id) });
+  }
+
+  const corrRuleType =
+    f.correspondents.mode === 'include'
+      ? FILTER_HAS_CORRESPONDENT_ANY
+      : FILTER_DOES_NOT_HAVE_CORRESPONDENT;
+  for (const id of f.correspondents.ids) {
+    rules.push({ rule_type: corrRuleType, value: String(id) });
+  }
+
+  const dtRuleType =
+    f.documentTypes.mode === 'include'
+      ? FILTER_HAS_DOCUMENT_TYPE_ANY
+      : FILTER_DOES_NOT_HAVE_DOCUMENT_TYPE;
+  for (const id of f.documentTypes.ids) {
+    rules.push({ rule_type: dtRuleType, value: String(id) });
+  }
+
+  const spRuleType =
+    f.storagePaths.mode === 'include'
+      ? FILTER_HAS_STORAGE_PATH_ANY
+      : FILTER_DOES_NOT_HAVE_STORAGE_PATH;
+  for (const id of f.storagePaths.ids) {
+    rules.push({ rule_type: spRuleType, value: String(id) });
+  }
+
+  if (f.createdDate.from && f.createdDate.to) {
+    rules.push({ rule_type: FILTER_CREATED_FROM, value: f.createdDate.from });
+    rules.push({ rule_type: FILTER_CREATED_TO, value: f.createdDate.to });
+  }
+
+  if (f.addedDate.from && f.addedDate.to) {
+    rules.push({ rule_type: FILTER_ADDED_FROM, value: f.addedDate.from });
+    rules.push({ rule_type: FILTER_ADDED_TO, value: f.addedDate.to });
+  }
+
+  return rules;
+}
 
 export const DocumentsStore = signalStore(
   withState(initialState),
   withRequestStatus(),
-  withLocalStorage('paperless:documents', [
+  withLocalStorage('paperless:documents-v2', [
     'displayMode',
     'displayFields',
     'sortField',
-    'filters',
+    'documentFilters',
   ]),
   withComputed((store) => {
     const tagsStore = inject(TagsStore);
@@ -61,6 +127,33 @@ export const DocumentsStore = signalStore(
     const documentTypesStore = inject(DocumentTypesStore);
     const storagePathsStore = inject(StoragePathsStore);
     return {
+      filterRules: computed<FilterRule[]>(() =>
+        deriveFilterRules(store.documentFilters()),
+      ),
+
+      selectedTags: computed(() => {
+        const ids = store.documentFilters().tags.ids;
+        return tagsStore.tags().filter((t) => ids.includes(t.id!));
+      }),
+      selectedCorrespondents: computed(() => {
+        const ids = store.documentFilters().correspondents.ids;
+        return correspondentsStore
+          .correspondents()
+          .filter((c) => ids.includes(c.id!));
+      }),
+      selectedDocumentTypes: computed(() => {
+        const ids = store.documentFilters().documentTypes.ids;
+        return documentTypesStore
+          .documentTypes()
+          .filter((dt) => ids.includes(dt.id!));
+      }),
+      selectedStoragePaths: computed(() => {
+        const ids = store.documentFilters().storagePaths.ids;
+        return storagePathsStore
+          .storagePaths()
+          .filter((sp) => ids.includes(sp.id!));
+      }),
+
       resolvedDocuments: computed<ResolvedDocument[]>(() => {
         const tags = tagsStore.tags();
         const correspondents = correspondentsStore.correspondents();
@@ -69,36 +162,22 @@ export const DocumentsStore = signalStore(
         return store.documents().map((doc) => ({
           ...doc,
           correspondent: correspondents.find((c) => c.id === doc.correspondent),
-          document_type: documentTypes.find((dt) => dt.id === doc.document_type),
+          document_type: documentTypes.find(
+            (dt) => dt.id === doc.document_type,
+          ),
           storage_path: storagePaths.find((sp) => sp.id === doc.storage_path),
-          tags: doc.tags?.map((id) => tags.find((t) => t.id === id)).filter((t) => t !== undefined),
+          tags: doc.tags
+            ?.map((id) => tags.find((t) => t.id === id))
+            .filter((t) => t !== undefined),
         }));
       }),
     };
   }),
   withMethods((store, documentService = inject(DocumentService)) => ({
-    async loadDocuments(
-      filters: FilterRule[] = store.filters(),
-      params: { ordering?: string } = {},
-    ) {
-      patchState(store, setPending());
-
-      try {
-        const result: SearchResult<Document> =
-          await documentService.getDocuments(filters, params);
-        patchState(store, {
-          documents: result.results,
-          ...setFulfilled(),
-        });
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to load documents';
-        patchState(store, setError(message));
-      }
-    },
     setDisplayMode(mode: DisplayMode) {
       patchState(store, { displayMode: mode });
     },
+
     toggleDisplayField(fieldId: DisplayField) {
       const current = store.displayFields();
       const exists = current.some((f) => f.id === fieldId);
@@ -108,17 +187,100 @@ export const DocumentsStore = signalStore(
           : [...current, DEFAULT_DISPLAY_FIELDS.find((f) => f.id === fieldId)!],
       });
     },
+
     setSortField(field: { field: string; name: string }) {
       patchState(store, { sortField: field });
-      this.loadDocuments(store.filters(), { ordering: field.field });
+      this.loadDocuments(deriveFilterRules(store.documentFilters()), {
+        ordering: field.field,
+      });
     },
-    setFilters(filters: FilterRule[]) {
-      patchState(store, { filters });
+
+    patchFilters(patch: Partial<DocumentFilters>) {
+      const updated = { ...store.documentFilters(), ...patch };
+      patchState(store, { documentFilters: updated });
       const sortField = store.sortField();
       this.loadDocuments(
-        filters,
+        deriveFilterRules(updated),
         sortField ? { ordering: sortField.field } : {},
       );
+    },
+
+    setTagFilter(ids: number[]) {
+      this.patchFilters({ tags: { ...store.documentFilters().tags, ids } });
+    },
+
+    setTagMode(mode: 'all' | 'any') {
+      const current = store.documentFilters().tags;
+      this.patchFilters({ tags: { ...current, mode } });
+    },
+
+    setCorrespondentFilter(ids: number[]) {
+      this.patchFilters({
+        correspondents: { ...store.documentFilters().correspondents, ids },
+      });
+    },
+
+    setCorrespondentMode(mode: 'include' | 'exclude') {
+      const current = store.documentFilters().correspondents;
+      this.patchFilters({ correspondents: { ...current, mode } });
+    },
+
+    setDocumentTypeFilter(ids: number[]) {
+      this.patchFilters({
+        documentTypes: { ...store.documentFilters().documentTypes, ids },
+      });
+    },
+
+    setDocumentTypeMode(mode: 'include' | 'exclude') {
+      const current = store.documentFilters().documentTypes;
+      this.patchFilters({ documentTypes: { ...current, mode } });
+    },
+
+    setStoragePathFilter(ids: number[]) {
+      this.patchFilters({
+        storagePaths: { ...store.documentFilters().storagePaths, ids },
+      });
+    },
+
+    setStoragePathMode(mode: 'include' | 'exclude') {
+      const current = store.documentFilters().storagePaths;
+      this.patchFilters({ storagePaths: { ...current, mode } });
+    },
+
+    setDateFilter(field: 'created' | 'added', preset: DatePreset) {
+      const key = field === 'created' ? 'createdDate' : 'addedDate';
+      const range = dateRangeForPreset(preset);
+      this.patchFilters({ [key]: { preset, ...range } });
+    },
+
+    setCustomDateFilter(field: 'created' | 'added', from: string, to: string) {
+      const key = field === 'created' ? 'createdDate' : 'addedDate';
+      this.patchFilters({ [key]: { preset: null, from, to } });
+    },
+
+    clearDateFilter(field: 'created' | 'added') {
+      const key = field === 'created' ? 'createdDate' : 'addedDate';
+      this.patchFilters({ [key]: { preset: null, from: null, to: null } });
+    },
+
+    clearAllFilters() {
+      this.patchFilters(initialDocumentFilters);
+    },
+
+    async loadDocuments(
+      rules: FilterRule[] = deriveFilterRules(store.documentFilters()),
+      params: { ordering?: string } = {},
+    ) {
+      patchState(store, setPending());
+      try {
+        const result: SearchResult<Document> =
+          await documentService.getDocuments(rules, params);
+        patchState(store, { documents: result.results, ...setFulfilled() });
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to load documents';
+        patchState(store, setError(message));
+      }
     },
   })),
 
@@ -132,7 +294,7 @@ export const DocumentsStore = signalStore(
       tagsStore.loadAllTags();
       correspondentsStore.loadAllCorrespondents();
       store.loadDocuments(
-        store.filters(),
+        deriveFilterRules(store.documentFilters()),
         sortField ? { ordering: sortField.field } : {},
       );
     },

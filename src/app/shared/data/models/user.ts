@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
   id?: number;
   username?: string;
   first_name?: string;
@@ -11,4 +11,4 @@ export interface User {
   user_permissions?: string[];
   inherited_permissions?: string[];
   is_mfa_enabled?: boolean;
-}
+};

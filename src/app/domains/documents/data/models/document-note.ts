@@ -1,6 +1,6 @@
 import { User } from "@shared/data/models/user";
 
-export interface DocumentNote {
+export type DocumentNote = {
   id: number;
   created?: Date;
   note?: string;

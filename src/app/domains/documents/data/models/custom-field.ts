@@ -1,4 +1,4 @@
-export interface CustomFieldInstance {
+export type CustomFieldInstance = {
   id: number;
   document: number; // Document
   field: number; // CustomField

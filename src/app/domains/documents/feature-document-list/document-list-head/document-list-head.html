@@ -12,6 +12,106 @@
     </div>
   </div>
 
+  <hlm-dialog>
+    <!-- Date Selector -->
+    <button hlmDialogTrigger hlmBtn variant="outline" size="sm" (click)="onDateDialogOpen()">
+      <ng-icon name="lucideCalendarDays" />
+      <ng-container i18n>Date</ng-container>
+      @if (isDateFilterActive()) {
+        <span hlmBadge variant="secondary" aria-label="Date filter active">●</span>
+      }
+    </button>
+    <hlm-dialog-content class="sm:max-w-[525px]" *hlmDialogPortal="let ctx">
+      <hlm-dialog-header>
+        <ng-container i18n>Select Date</ng-container>
+      </hlm-dialog-header>
+      <hlm-separator></hlm-separator>
+      <div
+        hlmToggleGroup
+        type="single"
+        size="sm"
+        variant="outline"
+        class="w-full"
+        [value]="dialogDateField()"
+        (valueChange)="onDialogDateFieldChange($any($event))"
+      >
+        <button hlmToggleGroupItem value="created" class="flex-1" aria-label="Created date">
+          <ng-container i18n>Created</ng-container>
+        </button>
+        <button hlmToggleGroupItem value="added" class="flex-1" aria-label="Added date">
+          <ng-container i18n>Added</ng-container>
+        </button>
+      </div>
+      <div class="h-full flex space-x-2">
+        <hlm-toggle-group
+          type="single"
+          nullable
+          size="sm"
+          class="flex flex-col gap-2 justify-stretch"
+          [value]="dialogDatePreset()"
+          (valueChange)="onDialogPresetChange($any($event))"
+        >
+          <button
+            hlmToggleGroupItem
+            value="today"
+            aria-label="Today"
+            class="w-full justify-start"
+          >
+            <ng-container i18n>Today</ng-container>
+          </button>
+          <button
+            hlmToggleGroupItem
+            value="yesterday"
+            aria-label="Yesterday"
+            class="w-full justify-start"
+          >
+            <ng-container i18n>Yesterday</ng-container>
+          </button>
+          <button
+            hlmToggleGroupItem
+            value="7days"
+            aria-label="Last 7 days"
+            class="w-full justify-start"
+          >
+            <ng-container i18n>Last 7 days</ng-container>
+          </button>
+          <button
+            hlmToggleGroupItem
+            value="30days"
+            aria-label="Last 30 days"
+            class="w-full justify-start"
+          >
+            <ng-container i18n>Last 30 days</ng-container>
+          </button>
+          <button
+            hlmToggleGroupItem
+            value="1year"
+            aria-label="Last year"
+            class="w-full justify-start"
+          >
+            <ng-container i18n>Last year</ng-container>
+          </button>
+        </hlm-toggle-group>
+        <hlm-calendar-range
+          [startDate]="dialogDateStart() ?? undefined"
+          (startDateChange)="onCalendarStartChange($event)"
+          [endDate]="dialogDateEnd() ?? undefined"
+          (endDateChange)="onCalendarEndChange($event)"
+          [min]="minDate"
+          [max]="maxDate"
+        />
+      </div>
+      <hlm-dialog-footer>
+        <button hlmBtn hlmDialogClose variant="outline" size="sm">
+          <ng-container i18n>Cancel</ng-container>
+        </button>
+        <button hlmBtn hlmDialogClose size="sm" (click)="applyDateFilter()">
+          <ng-container i18n>Apply</ng-container>
+        </button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
   <hlm-sheet side="right">
     <!-- Filter Button -->
     <button
@@ -32,7 +132,10 @@
       }
     </button>
 
-    <hlm-sheet-content *hlmSheetPortal="let ctx" class="p-2">
+    <hlm-sheet-content
+      *hlmSheetPortal="let ctx"
+      class="p-2 w-[400px] sm:w-[540px] sm:max-w-none"
+    >
       <hlm-sheet-header>
         <h3 hlmSheetTitle>Filters</h3>
         <p hlmSheetDescription>Narrow down your documents.</p>
@@ -128,4 +231,10 @@
       <ng-icon name="lucideList" />
     </button>
   </div>
+
+  <!-- Save Views -->
+  <button hlmBtn variant="default" size="sm">
+    <ng-icon name="lucideSave"></ng-icon>
+    <ng-container i18n>Save View</ng-container>
+  </button>
 </div>

@@ -15,7 +15,7 @@ export enum DisplayField {
   PAGE_COUNT = 'pagecount',
 }
 
-export interface SortField {
+export type SortField = {
   field: string;
   name: string;
 }

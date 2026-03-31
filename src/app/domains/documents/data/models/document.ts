@@ -7,14 +7,14 @@ import { StoragePath } from '@shared/data/models/storage-path';
 import { CustomFieldInstance } from './custom-field';
 import { DocumentNote } from './document-note';
 
-export interface SearchHit {
+export type SearchHit = {
   score?: number;
   rank?: number;
   highlights?: string;
   note_highlights?: string;
 }
 
-export interface Document extends OwnedResource {
+export type Document = OwnedResource & {
   id: number;
   correspondent?: number;
   document_type?: number;
