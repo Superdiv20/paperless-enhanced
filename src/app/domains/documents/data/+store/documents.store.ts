@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -37,11 +37,15 @@ import {
   FILTER_CREATED_TO,
   FILTER_ADDED_FROM,
   FILTER_ADDED_TO,
+  FILTER_OWNER_ANY,
+  FILTER_OWNER_DOES_NOT_INCLUDE,
+  FILTER_OWNER_ISNULL,
 } from '@shared/data/models/filter-rule-type';
 import { TagsStore } from '@shared/data/+store/tags.store';
 import { CorrespondentsStore } from '@shared/data/+store/correspondents.store';
 import { DocumentTypesStore } from '@shared/data/+store/document-types.store';
 import { StoragePathsStore } from '@shared/data/+store/storage-paths.store';
+import { UsersStore } from '@shared/data/+store/users.store';
 import { computed } from '@angular/core';
 import {
   DatePreset,
@@ -109,6 +113,20 @@ function deriveFilterRules(f: DocumentFilters): FilterRule[] {
     rules.push({ rule_type: FILTER_ADDED_TO, value: f.addedDate.to });
   }
 
+  if (f.owner.ids.length > 0) {
+    const ownerRuleType =
+      f.owner.mode === 'include'
+        ? FILTER_OWNER_ANY
+        : FILTER_OWNER_DOES_NOT_INCLUDE;
+    for (const id of f.owner.ids) {
+      rules.push({ rule_type: ownerRuleType, value: String(id) });
+    }
+  }
+
+  if (f.owner.includeUnowned) {
+    rules.push({ rule_type: FILTER_OWNER_ISNULL, value: 'true' });
+  }
+
   return rules;
 }
 
@@ -126,6 +144,7 @@ export const DocumentsStore = signalStore(
     const correspondentsStore = inject(CorrespondentsStore);
     const documentTypesStore = inject(DocumentTypesStore);
     const storagePathsStore = inject(StoragePathsStore);
+    const usersStore = inject(UsersStore);
     return {
       filterRules: computed<FilterRule[]>(() =>
         deriveFilterRules(store.documentFilters()),
@@ -152,6 +171,11 @@ export const DocumentsStore = signalStore(
         return storagePathsStore
           .storagePaths()
           .filter((sp) => ids.includes(sp.id!));
+      }),
+
+      selectedOwners: computed(() => {
+        const ids = store.documentFilters().owner.ids;
+        return usersStore.users().filter((u) => ids.includes(u.id!));
       }),
 
       resolvedDocuments: computed<ResolvedDocument[]>(() => {
@@ -247,6 +271,24 @@ export const DocumentsStore = signalStore(
       this.patchFilters({ storagePaths: { ...current, mode } });
     },
 
+    setOwnerFilter(ids: number[]) {
+      this.patchFilters({
+        owner: { ...store.documentFilters().owner, ids },
+      });
+    },
+
+    setOwnerMode(mode: 'include' | 'exclude') {
+      this.patchFilters({
+        owner: { ...store.documentFilters().owner, mode },
+      });
+    },
+
+    setOwnerIncludeUnowned(includeUnowned: boolean) {
+      this.patchFilters({
+        owner: { ...store.documentFilters().owner, includeUnowned },
+      });
+    },
+
     setDateFilter(field: 'created' | 'added', preset: DatePreset) {
       const key = field === 'created' ? 'createdDate' : 'addedDate';
       const range = dateRangeForPreset(preset);
@@ -286,13 +328,12 @@ export const DocumentsStore = signalStore(
 
   withHooks({
     onInit(store) {
-      const tagsStore = inject(TagsStore);
-      const correspondentsStore = inject(CorrespondentsStore);
+      inject(TagsStore).loadAllTags();
+      inject(CorrespondentsStore).loadAllCorrespondents();
       inject(DocumentTypesStore).loadAllDocumentTypes();
       inject(StoragePathsStore).loadAllStoragePaths();
+      inject(UsersStore).loadAllUsers();
       const sortField = store.sortField();
-      tagsStore.loadAllTags();
-      correspondentsStore.loadAllCorrespondents();
       store.loadDocuments(
         deriveFilterRules(store.documentFilters()),
         sortField ? { ordering: sortField.field } : {},

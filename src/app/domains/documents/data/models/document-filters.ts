@@ -43,6 +43,13 @@ export interface DocumentFilters {
     mode: 'include' | 'exclude';
     ids: number[];
   };
+  owner: {
+    /** IDs of owners to include or exclude. Empty = no owner filter. */
+    ids: number[];
+    mode: 'include' | 'exclude';
+    /** When true, also include documents with no owner. */
+    includeUnowned: boolean;
+  };
   createdDate: DateFilterState;
   addedDate: DateFilterState;
 }
@@ -52,6 +59,7 @@ export const initialDocumentFilters: DocumentFilters = {
   correspondents: { mode: 'include', ids: [] },
   documentTypes: { mode: 'include', ids: [] },
   storagePaths: { mode: 'include', ids: [] },
+  owner: { ids: [], mode: 'include', includeUnowned: false },
   createdDate: { preset: null, from: null, to: null },
   addedDate: { preset: null, from: null, to: null },
 };

@@ -12,7 +12,7 @@ import {
   withRequestStatus,
 } from '@shared/utils/with-request-status';
 import { StoragePath } from '@shared/data/models/storage-path';
-import { StoragePathService } from '@shared/data/services/storage-path-service';
+import { StoragePathService } from '@shared/data/services/storage-path';
 
 export interface StoragePathsState {
   storagePaths: StoragePath[];

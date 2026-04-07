@@ -1,5 +1,6 @@
 import { effect } from '@angular/core';
 import { patchState, signalStoreFeature, withHooks } from '@ngrx/signals';
+import { toast } from 'ngx-sonner';
 
 /**
  * A reusable SignalStore feature that hydrates a slice of state from
@@ -20,28 +21,35 @@ export function withLocalStorage(storageKey: string, fields: string[]) {
           if (raw) {
             const parsed = JSON.parse(raw) as Record<string, unknown>;
             const safe = Object.fromEntries(
-              fields
-                .filter((f) => f in parsed)
-                .map((f) => [f, parsed[f]]),
+              fields.filter((f) => f in parsed).map((f) => [f, parsed[f]]),
             );
             if (Object.keys(safe).length) {
               patchState(store as Parameters<typeof patchState>[0], safe);
             }
           }
-        } catch {
-          // Corrupt or missing storage entry — silently skip
+        } catch (e: Error | unknown) {
+          toast.error(
+            `Failed to load persisted settings: ${
+              e instanceof Error ? e.message : String(e)
+            }`,
+          );
         }
 
         effect(() => {
           const slice: Record<string, unknown> = {};
           for (const field of fields) {
             const sig = store[field];
-            slice[field] = typeof sig === 'function' ? (sig as () => unknown)() : sig;
+            slice[field] =
+              typeof sig === 'function' ? (sig as () => unknown)() : sig;
           }
           try {
             localStorage.setItem(storageKey, JSON.stringify(slice));
-          } catch {
-            // Storage quota exceeded or unavailable — silently skip
+          } catch (e: Error | unknown) {
+            toast.error(
+              `Failed to persist settings: ${
+                e instanceof Error ? e.message : String(e)
+              }`,
+            );
           }
         });
       },

@@ -208,4 +208,54 @@
       </div>
     }
   </div>
+
+  <!-- Owner -->
+  <div class="flex flex-col gap-2">
+    <label hlmLabel i18n>
+      <ng-icon name="lucideShield"></ng-icon>
+      {{ "Owner" }}
+    </label>
+    <hlm-combobox-multiple
+      [value]="selectedOwners()"
+      [itemToString]="userLabel"
+      (valueChange)="onOwnersChange($any($event))"
+    >
+      <hlm-combobox-chips>
+        @for (user of selectedOwners(); track user.id) {
+          <hlm-combobox-chip [value]="user">{{ user.username }}</hlm-combobox-chip>
+        }
+        <input hlmComboboxChipInput placeholder="Search users..." />
+      </hlm-combobox-chips>
+      <hlm-combobox-content *hlmComboboxPortal>
+        <ul hlmComboboxList>
+          <hlm-combobox-empty>
+            <ng-container i18n>No users found.</ng-container>
+          </hlm-combobox-empty>
+          @for (user of users(); track user.id) {
+            <hlm-combobox-item [value]="user">{{ user.username }}</hlm-combobox-item>
+          }
+        </ul>
+      </hlm-combobox-content>
+    </hlm-combobox-multiple>
+    @if (selectedOwners().length > 0) {
+      <div class="flex items-center gap-2">
+        <hlm-switch
+          [checked]="ownerMode() === 'exclude'"
+          aria-label="Exclude owners"
+          (checkedChange)="onOwnerModeChange($event ? 'exclude' : 'include')"
+        />
+        <span class="text-muted-foreground text-sm" i18n>
+          {{ ownerMode() === "exclude" ? "Exclude selected" : "Include selected" }}
+        </span>
+      </div>
+    }
+    <div class="flex items-center gap-2">
+      <hlm-switch
+        [checked]="ownerIncludeUnowned()"
+        aria-label="Include unowned documents"
+        (checkedChange)="onOwnerIncludeUnownedChange($event)"
+      />
+      <span class="text-muted-foreground text-sm" i18n>Include unowned</span>
+    </div>
+  </div>
 </div>

@@ -14,14 +14,14 @@
 
   <hlm-dialog>
     <!-- Date Selector -->
-    <button hlmDialogTrigger hlmBtn variant="outline" size="sm" (click)="onDateDialogOpen()">
+    <button hlmDialogTrigger hlmBtn variant="outline" size="sm" (click)="onDateDialogOpen()" class="w-full sm:w-auto">
       <ng-icon name="lucideCalendarDays" />
       <ng-container i18n>Date</ng-container>
       @if (isDateFilterActive()) {
         <span hlmBadge variant="secondary" aria-label="Date filter active">●</span>
       }
     </button>
-    <hlm-dialog-content class="sm:max-w-[525px]" *hlmDialogPortal="let ctx">
+    <hlm-dialog-content class="sm:max-w-[425px]" *hlmDialogPortal="let ctx">
       <hlm-dialog-header>
         <ng-container i18n>Select Date</ng-container>
       </hlm-dialog-header>
@@ -119,8 +119,8 @@
       hlmSheetTrigger
       variant="outline"
       size="sm"
-      class="hidden sm:inline-flex"
       aria-label="Filter documents"
+      class="w-full sm:w-auto"
     >
       <ng-icon name="lucideFilter" />
       Filter
@@ -159,7 +159,6 @@
     variant="outline"
     size="sm"
     [disabled]="displayMode() === DisplayMode.TABLE"
-    class="hidden sm:inline-flex"
     aria-label="Sort documents"
     [hlmDropdownMenuTrigger]="sorting"
   >
@@ -188,7 +187,6 @@
     hlmBtn
     variant="outline"
     size="sm"
-    class="hidden sm:inline-flex"
     aria-label="Select fields to display"
     [hlmDropdownMenuTrigger]="fields"
   >
