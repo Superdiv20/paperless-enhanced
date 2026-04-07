@@ -11,6 +11,7 @@ export type Permissions = {
 }
 
 export type OwnedResource = {
+  id: number;
   owner?: number;
   permissions?: Permissions;
   user_can_change?: boolean;

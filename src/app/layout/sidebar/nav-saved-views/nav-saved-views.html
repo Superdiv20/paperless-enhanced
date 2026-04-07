@@ -1,0 +1,15 @@
+<hlm-sidebar-group>
+  <ul hlmSidebarMenu>
+    <li hlmSidebarMenuItem>
+      <a
+        hlmSidebarMenuButton
+        [isActive]="navItem().isActive"
+        [routerLink]="navItem().url"
+      >
+        <ng-icon [name]="navItem().icon" />
+        {{ navItem().title }}
+      </a>
+      <div hlmSidebarMenuBadge>{{ savedViewsCount() }}</div>
+    </li>
+  </ul>
+</hlm-sidebar-group>

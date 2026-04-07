@@ -9,7 +9,6 @@ export const sidebarData = {
     url: '/documents',
     icon: 'lucideFileText',
   },
-
   navLibrary: [
     {
       title: 'Library',
@@ -31,7 +30,11 @@ export const sidebarData = {
       ],
     },
   ],
-  navSavedViews: [], // populated dynamically from /api/saved_views/
+  navSavedViews: {
+    title: 'Saved Views',
+    url: '/saved-views',
+    icon: 'lucideBookMarked',
+  },
   navOrganize: [
     {
       title: 'Organize',

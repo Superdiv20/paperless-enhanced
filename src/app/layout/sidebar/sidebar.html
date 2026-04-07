@@ -26,6 +26,10 @@
         <paperless-nav-library
           [libraryItems]="data.navLibrary"
         ></paperless-nav-library>
+        <paperless-nav-saved-views
+          [navItem]="data.navSavedViews"
+          [savedViewsCount]="savedViewsCount()"
+        ></paperless-nav-saved-views>
         <paperless-nav-organize
           [organizeItems]="data.navOrganize"
         ></paperless-nav-organize>
@@ -37,7 +41,7 @@
         ></paperless-nav-administration>
         <paperless-nav-secondary
           class="mt-auto"
-          [currentVersion]="currentVersion"
+          [currentVersion]="currentVersion()"
         ></paperless-nav-secondary>
       </hlm-sidebar-content>
       <hlm-sidebar-footer>
