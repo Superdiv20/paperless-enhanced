@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prepare": "husky"
   },
   "prettier": {
     "overrides": [
@@ -50,9 +51,18 @@
     "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.5",
     "@angular/localize": "^21.1.5",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "@ngrx/signals": "^21.0.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.8",
+    "@semantic-release/release-notes-generator": "^14.1.1",
     "@spartan-ng/cli": "^0.0.1-alpha.640",
     "@types/jasmine": "~5.1.0",
+    "commitizen": "^4.3.1",
+    "husky": "^9.1.7",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
