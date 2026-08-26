@@ -36,6 +36,24 @@ export const DEFAULT_DISPLAY_FIELDS: { id: DisplayField; name: string }[] = [
   { id: DisplayField.PAGE_COUNT, name: 'Pages' },
 ];
 
+export const ALWAYS_VISIBLE_DISPLAY_FIELDS = new Set<DisplayField>([
+  DisplayField.TITLE,
+  DisplayField.CREATED,
+  DisplayField.ADDED,
+  DisplayField.ASN,
+  DisplayField.PAGE_COUNT,
+  DisplayField.SHARED,
+]);
+
+export const DISPLAY_FIELD_PERMISSION_TOKENS: Partial<Record<DisplayField, string[]>> = {
+  [DisplayField.TAGS]: ['tag'],
+  [DisplayField.CORRESPONDENT]: ['correspondent'],
+  [DisplayField.DOCUMENT_TYPE]: ['documenttype', 'document_type'],
+  [DisplayField.STORAGE_PATH]: ['storagepath', 'storage_path'],
+  [DisplayField.NOTES]: ['note'],
+  [DisplayField.OWNER]: ['user'],
+};
+
 export const DEFAULT_DASHBOARD_DISPLAY_FIELDS: DisplayField[] = [
   DisplayField.CREATED,
   DisplayField.TITLE,

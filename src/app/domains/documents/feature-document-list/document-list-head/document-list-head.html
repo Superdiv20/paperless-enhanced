@@ -196,7 +196,7 @@
   <ng-template #fields>
     <hlm-dropdown-menu class="w-56">
       <hlm-dropdown-menu-group>
-        @for (field of allDisplayFields; track field.id) {
+        @for (field of allDisplayFields(); track field.id) {
           <button
             hlmDropdownMenuCheckbox
             [checked]="isDisplayFieldActive(field.id)"

@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -46,13 +46,14 @@ import { CorrespondentsStore } from '@shared/data/+store/correspondents.store';
 import { DocumentTypesStore } from '@shared/data/+store/document-types.store';
 import { StoragePathsStore } from '@shared/data/+store/storage-paths.store';
 import { UsersStore } from '@shared/data/+store/users.store';
-import { computed } from '@angular/core';
 import {
   DatePreset,
   DocumentFilters,
   dateRangeForPreset,
   initialDocumentFilters,
 } from '../models/document-filters';
+import { AppSettingsStore } from '@shared/data/+store/app-settings.store';
+import { canViewDisplayField } from '../utils/display-field-permissions';
 
 export interface DocumentsState {
   documents: Document[];
@@ -145,7 +146,33 @@ export const DocumentsStore = signalStore(
     const documentTypesStore = inject(DocumentTypesStore);
     const storagePathsStore = inject(StoragePathsStore);
     const usersStore = inject(UsersStore);
+    const appSettingsStore = inject(AppSettingsStore);
+
+    const availableDisplayFields = computed(() => {
+      const notesEnabled = appSettingsStore.notesEnabled();
+      const permissions = appSettingsStore.permissions();
+      const isSuperuser = appSettingsStore.isSuperuser();
+
+      return DEFAULT_DISPLAY_FIELDS.filter(
+        (field) =>
+          (notesEnabled || field.id !== DisplayField.NOTES) &&
+          canViewDisplayField(field.id, permissions, isSuperuser),
+      );
+    });
+
+    const visibleDisplayFields = computed(() => {
+      const availableIds = new Set(
+        availableDisplayFields().map((field) => field.id),
+      );
+      return store
+        .displayFields()
+        .filter((field) => availableIds.has(field.id));
+    });
+
     return {
+      availableDisplayFields,
+      visibleDisplayFields,
+
       filterRules: computed<FilterRule[]>(() =>
         deriveFilterRules(store.documentFilters()),
       ),
@@ -203,12 +230,17 @@ export const DocumentsStore = signalStore(
     },
 
     toggleDisplayField(fieldId: DisplayField) {
+      const available = store.availableDisplayFields();
+      if (!available.some((field) => field.id === fieldId)) {
+        return;
+      }
+
       const current = store.displayFields();
       const exists = current.some((f) => f.id === fieldId);
       patchState(store, {
         displayFields: exists
           ? current.filter((f) => f.id !== fieldId)
-          : [...current, DEFAULT_DISPLAY_FIELDS.find((f) => f.id === fieldId)!],
+          : [...current, available.find((f) => f.id === fieldId)!],
       });
     },
 

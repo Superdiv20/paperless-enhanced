@@ -9,7 +9,9 @@
         <ng-icon [name]="navItem().icon" />
         {{ navItem().title }}
       </a>
+      @if (showSavedViewsCount()) {
       <div hlmSidebarMenuBadge>{{ savedViewsCount() }}</div>
+      }
     </li>
   </ul>
 </hlm-sidebar-group>

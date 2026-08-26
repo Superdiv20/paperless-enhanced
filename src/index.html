@@ -6,6 +6,34 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add('theme-initializing');
+
+      var mode = null;
+      try {
+        mode = localStorage.getItem('paperless:theme-mode');
+      } catch (e) {
+        mode = null;
+      }
+
+      var prefersDark =
+        typeof window !== 'undefined' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      var isDark =
+        mode === 'dark' || (mode === 'system' && prefersDark);
+
+      root.classList.toggle('dark', isDark);
+      root.style.colorScheme = isDark ? 'dark' : 'light';
+
+      requestAnimationFrame(function () {
+        root.classList.remove('theme-initializing');
+      });
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

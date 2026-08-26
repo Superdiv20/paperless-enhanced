@@ -7,7 +7,6 @@ import { lucideLoader } from '@ng-icons/lucide';
 import { provideIcons } from '@ng-icons/core';
 import { DocumentCardVertical } from './document-card-vertical/document-card-vertical';
 import { DocumentTable } from './document-table/document-table';
-import { DEFAULT_DISPLAY_FIELDS } from '../data/models/document-display';
 
 @Component({
   selector: 'paperless-document-list',
@@ -34,6 +33,6 @@ export class DocumentList {
   public readonly documents = this.documentStore.resolvedDocuments;
   public readonly viewMode = this.documentStore.displayMode;
   public readonly displayFieldIds = computed(() =>
-    this.documentStore.displayFields().map((f) => f.id),
+    this.documentStore.visibleDisplayFields().map((f) => f.id),
   );
 }

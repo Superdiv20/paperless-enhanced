@@ -1,8 +1,9 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideBookMarked } from '@ng-icons/lucide';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
+import { AppSettingsStore } from '@shared/data/+store/app-settings.store';
 
 @Component({
   selector: 'paperless-nav-saved-views',
@@ -16,6 +17,8 @@ import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
   ],
 })
 export class NavSavedViews {
+  private readonly appSettingsStore = inject(AppSettingsStore);
+
   navItem = input.required<{
     title: string;
     icon: any;
@@ -23,4 +26,5 @@ export class NavSavedViews {
     isActive?: boolean;
   }>();
   savedViewsCount = input.required<number>();
+  showSavedViewsCount = this.appSettingsStore.sidebarViewsShowCount;
 }

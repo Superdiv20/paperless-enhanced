@@ -5,6 +5,14 @@
 
 @import "@spartan-ng/brain/hlm-tailwind-preset.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+.theme-initializing *,
+.theme-initializing *::before,
+.theme-initializing *::after {
+  transition: none !important;
+}
+
 :root {
   color-scheme: light;
 

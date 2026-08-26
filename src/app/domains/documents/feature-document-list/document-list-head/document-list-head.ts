@@ -26,7 +26,6 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { DisplayMode } from '../../data/models/display-mode';
 import {
-  DEFAULT_DISPLAY_FIELDS,
   DisplayField,
   DOCUMENT_SORT_FIELDS,
 } from '../../data/models/document-display';
@@ -160,8 +159,8 @@ export class DocumentListHead {
     () => this.documentStore.filterRules().length,
   );
   protected readonly displayMode = this.documentStore.displayMode;
-  protected readonly displayFields = this.documentStore.displayFields;
-  protected readonly allDisplayFields = DEFAULT_DISPLAY_FIELDS;
+  protected readonly displayFields = this.documentStore.visibleDisplayFields;
+  protected readonly allDisplayFields = this.documentStore.availableDisplayFields;
   protected readonly sortFields = DOCUMENT_SORT_FIELDS;
   protected readonly currentSortField = this.documentStore.sortField;
 
