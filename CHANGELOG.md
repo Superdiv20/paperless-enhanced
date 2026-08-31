@@ -1,3 +1,10 @@
+# [1.0.0-develop.2](https://github.com/Superdiv20/paperless-enhanced/compare/v1.0.0-develop.1...v1.0.0-develop.2) (2026-08-31)
+
+
+### Features
+
+* **settings:** add app settings infrastructure with reactive store and side-effect services ([b5378b1](https://github.com/Superdiv20/paperless-enhanced/commit/b5378b113a9217f5f4ad2a4fbac73c0c904d8ba3))
+
 # 1.0.0-develop.1 (2026-06-16)
 
 
