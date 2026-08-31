@@ -43,3 +43,9 @@ Thumbs.db
 
 # Environment files
 .env
+
+# Reference repos
+/paperless-ngx-original
+
+# Custom instructions
+/.github/instructions/paperless-reference.instructions.md
